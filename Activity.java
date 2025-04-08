@@ -1,7 +1,6 @@
-import java.awt.*;
 import javax.swing.*;
 
-//許雲林
+
 public class Activity extends JPanel{
 	private String actName, time, place;
 	private int price;
