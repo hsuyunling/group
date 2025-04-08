@@ -1,6 +1,6 @@
 import javax.swing.*;
 
-
+//grtgn
 public class Activity extends JPanel{
 	private String actName, time, place;
 	private int price;
