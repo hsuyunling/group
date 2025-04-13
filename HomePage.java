@@ -19,6 +19,7 @@ public class HomePage extends JFrame{
 
     public final void setBtnActionListener(){
         addActivity.addActionListener(new ActionListener() {
+            
             @Override
             public void actionPerformed(ActionEvent e){
                 // 當按鈕被點擊時，將 Activity 加入到中央區域
