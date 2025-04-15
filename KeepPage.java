@@ -14,7 +14,7 @@ public class KeepPage extends JFrame {
 		setTitle("收藏頁面");
 	        setSize(FRAME_WIDTH, FRAME_HEIGHT);
 	        setLayout(new BorderLayout());
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	        setVisible(true);
 		
 	        JPanel activityPanel = new JPanel();
