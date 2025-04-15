@@ -5,8 +5,16 @@ import java.util.*;
 import java.util.ArrayList;
 
 public class KeepPage extends JFrame {
+
 	private static final int FRAME_WIDTH = 650;
 	private static final int FRAME_HEIGHT = 750;
+	String actName;
+	String place;
+	int price;
+	int maxParticipants;
+	int currentParticipants;
+	Date startDate;
+	Date dueDate;
 	
 	public KeepPage() {
     	
@@ -23,16 +31,7 @@ public class KeepPage extends JFrame {
 	        JScrollPane scrollPane = new JScrollPane(activityPanel);
 	        add(scrollPane, BorderLayout.CENTER);
 	}
+}
 
-	public class Activity(){
-		
-		String actName;
-		String place;
-		int price;
-		int maxParticipants;
-		int currentParticipants;
-		Date startDate;
-		Date dueDate;
-	}
 
 	
