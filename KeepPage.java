@@ -23,4 +23,16 @@ public class KeepPage extends JFrame {
 	        JScrollPane scrollPane = new JScrollPane(activityPanel);
 	        add(scrollPane, BorderLayout.CENTER);
 	}
-}
+
+	public class Activity(){
+		
+		String actName;
+		String place;
+		int price;
+		int maxParticipants;
+		int currentParticipants;
+		Date startDate;
+		Date dueDate;
+	}
+
+	
