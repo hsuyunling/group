@@ -19,7 +19,7 @@ public class KeepPage extends JFrame {
 	public KeepPage() {
     	
 	   	// set frame
-		//test
+		
 		setTitle("收藏頁面");
 	        setSize(FRAME_WIDTH, FRAME_HEIGHT);
 	        setLayout(new BorderLayout());
