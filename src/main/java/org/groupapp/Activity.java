@@ -3,93 +3,119 @@ package org.groupapp;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
 import javax.swing.*;
 
-public class Activity extends JPanel{
-    private CardLayout cardLayout = new CardLayout();
+public class Activity extends JPanel {
+	private CardLayout cardLayout = new CardLayout();
 
-    private JPanel editPanel = new JPanel();
-    private JPanel completePanel = new JPanel();
+	private JPanel editPanel = new JPanel();
+	private JPanel completePanel = new JPanel();
 
-    private JTextField actName, date,  time, place, price, limitNumofPeople, dueDate, dueTime;
-    private JButton add;
+	private JTextField actName, date, time, place, price, limitNumofPeople, dueDate, dueTime;
+	private JButton add;
 	private JPanel basicInformation, actIntro, actSettings;
-    private JLabel timeLabel, placeLabel, priceLabel, limitLabel, introLabel, dueLabel, payLabel, contactLabel;
+	private JLabel timeLabel, placeLabel, priceLabel, limitLabel, introLabel, dueLabel, payLabel, contactLabel;
 	private JRadioButton online, free, cash, card;
-    private JTextArea introArea;
+	private JTextArea introArea;
 
-    private JTextField name = new JTextField("your name", 10);
-    private JButton confirm = new JButton("done");
-    private JLabel nameLabel = new JLabel(); // 用於完成模式顯示
+	private JTextField name = new JTextField("your name", 10);
+	private JButton confirm = new JButton("done");
+	private JLabel nameLabel = new JLabel(); // 用於完成模式顯示
 
-    private String organizerName, dateAndTime, completeActname;
+	private String organizerName, dateAndTime, completeActname;
 
-    public Activity() {
-        setLayout(cardLayout); // 套用 CardLayout 到 Activity（自己就是 JPanel）
+	public Activity() {
+		setLayout(cardLayout); // 套用 CardLayout 到 Activity（自己就是 JPanel）
 
-        createEditPanel();
-        createCompletePanel();
+		createEditPanel();
+		createCompletePanel();
 
-        // 加入兩種狀態到 CardLayout 中
-        add(editPanel, "edit");
-        add(completePanel, "complete");
+		// 加入兩種狀態到 CardLayout 中
+		add(editPanel, "edit");
+		add(completePanel, "complete");
 
-        // 預設顯示編輯模式
-        cardLayout.show(this, "edit");
-    }
+		// 預設顯示編輯模式
+		cardLayout.show(this, "edit");
+	}
 
-    // 建立編輯模式的畫面
-    public final void createEditPanel() {
-        createBasicInformationPanel();
-        createActIntroPanel();
-        createActSettingsPanel();
-        createLayout();
+	// 建立編輯模式的畫面
+	public final void createEditPanel() {
+		createBasicInformationPanel();
+		createActIntroPanel();
+		createActSettingsPanel();
+		createLayout();
 
-        confirm.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // 把輸入值存起來
-                completeActname = actName.getText(); 
-                dateAndTime = String.format("日期： %s\n時間： %s", date.getText(), time.getText());
-                // 更新完成模式的 label
-                nameLabel.setText(completeActname);
-                timeLabel.setText(dateAndTime);
-                
-                // 切到完成模式
-                cardLayout.show(Activity.this, "complete"); 
-            }
-        });
-    }
+		confirm.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// 把輸入值存起來
+				completeActname = actName.getText();
+				dateAndTime = String.format("日期： %s\n時間： %s", date.getText(), time.getText());
+				// 更新完成模式的 label
+				nameLabel.setText(completeActname);
+				timeLabel.setText(dateAndTime);
 
-    // 建立Activity
-    // 分成三個panel 上：活動基本資訊 中：活動簡介 下：活動報名設定
-	public void createBasicInformationPanel(){
+				//寫入資料庫
+				try (Connection conn = DBUtil.getConnection()) {
+					String sql = "INSERT INTO activity (name, date, time, place, price, limit_people, due_date, due_time, intro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+					PreparedStatement stmt = conn.prepareStatement(sql);
+					stmt.setString(1, actName.getText());
+					stmt.setString(2, date.getText());
+					stmt.setString(3, time.getText());
+					stmt.setString(4, place.getText());
+					stmt.setString(5, price.getText());
+					stmt.setInt(6, Integer.parseInt(limitNumofPeople.getText()));
+					stmt.setString(7, dueDate.getText());
+					stmt.setString(8, dueTime.getText());
+					stmt.setString(9, introArea.getText());
 
-		//使用者輸入活動資訊(活動名稱 活動時間 活動日期 活動地點 活動費用 人數限制)
+					int rows = stmt.executeUpdate();
+					if (rows > 0) {
+						JOptionPane.showMessageDialog(Activity.this, "活動已成功新增到資料庫！");
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(Activity.this, "資料庫新增失敗：" + ex.getMessage());
+				}
+
+				// 切到完成模式
+				cardLayout.show(Activity.this, "complete");
+			}
+		});
+	}
+
+	// 建立Activity
+	// 分成三個panel 上：活動基本資訊 中：活動簡介 下：活動報名設定
+	public void createBasicInformationPanel() {
+
+		// 使用者輸入活動資訊(活動名稱 活動時間 活動日期 活動地點 活動費用 人數限制)
 		actName = new JTextField("活動名稱");
 		timeLabel = new JLabel("Time: ");
 		date = new JTextField("YYYY-MM-DD", 10);
 		time = new JTextField("HH:MM", 5);
 
-		//information label
+		// information label
 		placeLabel = new JLabel("Place: ");
 		place = new JTextField(10);
 
-		//當online被點選 表示活動在線上 因此不用輸入place
+		// 當online被點選 表示活動在線上 因此不用輸入place
 		online = new JRadioButton("online");
-		if(online.isSelected()){
+		if (online.isSelected()) {
 			place.setEnabled(false);
-		}else{
+		} else {
 			place.setEnabled(true);
 		}
 
-		//當free被點選 表示免費活動 因此不用輸入price
+		// 當free被點選 表示免費活動 因此不用輸入price
 		priceLabel = new JLabel("Price: ");
 		price = new JTextField(4);
 		free = new JRadioButton("free");
-		if(free.isSelected()){
+		if (free.isSelected()) {
 			free.setEnabled(false);
-		}else{
+		} else {
 			free.setEnabled(true);
 		}
 
@@ -97,8 +123,8 @@ public class Activity extends JPanel{
 		limitNumofPeople = new JTextField(4);
 	}
 
-	//使用者隨意輸入活動相關資訊（textArea）
-	public void createActIntroPanel(){
+	// 使用者隨意輸入活動相關資訊（textArea）
+	public void createActIntroPanel() {
 		actIntro = new JPanel();
 		introLabel = new JLabel("活動簡介");
 		introArea = new JTextArea();
@@ -106,8 +132,8 @@ public class Activity extends JPanel{
 
 	}
 
-	//活動報名設定（報名截止時間 付款方式 輸入主揪聯絡方式）
-	public void createActSettingsPanel(){
+	// 活動報名設定（報名截止時間 付款方式 輸入主揪聯絡方式）
+	public void createActSettingsPanel() {
 		dueLabel = new JLabel("截止日期： ");
 		dueDate = new JTextField("YYYY-MM-DD", 10);
 		dueTime = new JTextField("HH:MM", 5);
@@ -122,27 +148,28 @@ public class Activity extends JPanel{
 		contactLabel = new JLabel("聯絡方式： ");
 		add = new JButton("+");
 		add.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e){
+			public void actionPerformed(ActionEvent e) {
 				addContact();
 			}
 		});
 
 	}
-			//增加聯絡方式
-	public void addContact(){
-		JTextField contactType = new JTextField("social media",5);
+
+	// 增加聯絡方式
+	public void addContact() {
+		JTextField contactType = new JTextField("social media", 5);
 		JTextField contactID = new JTextField("id", 20);
 		actSettings.add(contactType);
 		actSettings.add(contactID);
 	}
 
-	//layout
-	public void createLayout(){
+	// layout
+	public void createLayout() {
 		// basic information layout
-        basicInformation = new JPanel();
+		basicInformation = new JPanel();
 		basicInformation.setLayout(new BoxLayout(basicInformation, BoxLayout.Y_AXIS));
 		basicInformation.add(actName);
-        basicInformation.setVisible(true);
+		basicInformation.setVisible(true);
 
 		JPanel p1 = new JPanel();
 		p1.add(timeLabel);
@@ -166,29 +193,27 @@ public class Activity extends JPanel{
 		p4.add(limitLabel);
 		p4.add(limitNumofPeople);
 		basicInformation.add(p4);
-        editPanel.add(basicInformation);
+		editPanel.add(basicInformation);
 
 		// intro layout
-        actIntro = new JPanel();
+		actIntro = new JPanel();
 		actIntro.setLayout(new BoxLayout(actIntro, BoxLayout.Y_AXIS));
-        actIntro.setVisible(true);
+		actIntro.setVisible(true);
 
 		JPanel p5 = new JPanel();
 		p5.add(introLabel);
 		p5.add(introArea);
 		actIntro.add(p5);
-        editPanel.add(actIntro);
+		editPanel.add(actIntro);
 
 		// setting layout
 
-
-        editPanel.add(confirm);
+		editPanel.add(confirm);
 	}
 
-
-        // 建立完成模式的畫面
-        public final void createCompletePanel() {
-            completePanel.add(nameLabel);
-            completePanel.add(timeLabel);
-        }
+	// 建立完成模式的畫面
+	public final void createCompletePanel() {
+		completePanel.add(nameLabel);
+		completePanel.add(timeLabel);
+	}
 }
