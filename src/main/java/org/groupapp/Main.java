@@ -1,3 +1,5 @@
+package org.groupapp;
+
 import javax.swing.*;
 
 public class Main {
