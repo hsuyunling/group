@@ -23,6 +23,16 @@ public class Settings extends JPanel {
         createLayout();
     }
 
+    // 加在 class 裡最後面
+
+    public String getDueDate() {
+        return dueDate.getText();
+    }
+
+    public String getDueTime() {
+        return dueTime.getText();
+    }
+
     public void createActSettingsPanel() {
         dueLabel = new JLabel("截止日期： ");
         dueDate = new JTextField("YYYY-MM-DD", 10);
@@ -45,7 +55,7 @@ public class Settings extends JPanel {
                 deleteContactBtn.setVisible(true);
                 // 確保畫面更新，重新顯示新加入的面板
                 revalidate(); // 重新佈局
-                repaint();    // 重繪畫面
+                repaint(); // 重繪畫面
 
             }
         });
@@ -62,7 +72,7 @@ public class Settings extends JPanel {
         });
 
     }
-    //增加聯絡方式
+    // 增加聯絡方式
 
     public void addContact() {
         JPanel contactJPanel = new JPanel();

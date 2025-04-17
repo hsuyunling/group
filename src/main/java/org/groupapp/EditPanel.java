@@ -23,13 +23,44 @@ public class EditPanel extends JPanel {
 
     // 建立編輯模式的畫面
     public final void createEditPanel() {
-        
+
         cancel = new JButton("cancel");
         saveDraft = new JButton("save as a draft");
         back = new JButton("back");
         next = new JButton("next");
         confirm = new JButton("confirm");
+    
+        confirm.addActionListener(e -> {
+            try (java.sql.Connection conn = DBUtil.getConnection()) {
+                String sql = "INSERT INTO activity (name, date, time, place, price, limit_people, due_date, due_time, intro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
+    
+                // 向子元件索取資料
+                BasicInformation info = (BasicInformation) basicInformation;
+                ActIntro intro = (ActIntro) actIntro;
+                Settings set = (Settings) settings;
+    
+                stmt.setString(1, info.getName());
+                stmt.setString(2, info.getDate());
+                stmt.setString(3, info.getTime());
+                stmt.setString(4, info.getPlace());
+                stmt.setString(5, info.getPrice());
+                stmt.setInt(6, info.getLimitPeople());
+                stmt.setString(7, set.getDueDate());
+                stmt.setString(8, set.getDueTime());
+                stmt.setString(9, intro.getIntro());
+    
+                int rows = stmt.executeUpdate();
+                if (rows > 0) {
+                    JOptionPane.showMessageDialog(this, "✅ 活動成功新增到資料庫！");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "❌ 資料庫新增失敗：" + ex.getMessage());
+            }
+        });
     }
+    
 
     public JPanel createCardLayoutPanel() {
         cardLayoutPanel = new JPanel();
