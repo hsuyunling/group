@@ -23,17 +23,17 @@ public class BasicInformation extends JPanel {
 
     public void createBasicInformationPanel() {
 
-        //使用者輸入活動資訊(活動名稱 活動時間 活動日期 活動地點 活動費用 人數限制)
+        // 使用者輸入活動資訊(活動名稱 活動時間 活動日期 活動地點 活動費用 人數限制)
         actName = new JTextField("活動名稱", 20);
         timeLabel = new JLabel("Time: ");
         date = new JTextField("YYYY-MM-DD", 10);
         time = new JTextField("HH:MM", 5);
 
-        //information label
+        // information label
         placeLabel = new JLabel("Place: ");
         place = new JTextField(10);
 
-        //當online被點選 表示活動在線上 因此不用輸入place(還沒成功)
+        // 當online被點選 表示活動在線上 因此不用輸入place(還沒成功)
         online = new JRadioButton("online");
         if (online.isSelected()) {
             place.setEnabled(false);
@@ -41,7 +41,7 @@ public class BasicInformation extends JPanel {
             place.setEnabled(true);
         }
 
-        //當free被點選 表示免費活動 因此不用輸入price(還沒成功)
+        // 當free被點選 表示免費活動 因此不用輸入price(還沒成功)
         priceLabel = new JLabel("Price: ");
         price = new JTextField(4);
         free = new JRadioButton("free");
@@ -55,7 +55,7 @@ public class BasicInformation extends JPanel {
         limitNumofPeople = new JTextField(4);
     }
 
-    //layout
+    // layout
     public void createLayout() {
         // basic information layout
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -66,9 +66,9 @@ public class BasicInformation extends JPanel {
         p0.setLayout(new FlowLayout(FlowLayout.LEFT));
         p0.add(actName);
 
-		actName.setPreferredSize(new Dimension(0, 20));
+        actName.setPreferredSize(new Dimension(0, 20));
 
-		JPanel container = new JPanel();
+        JPanel container = new JPanel();
         JPanel p1 = new JPanel();
         p1.setLayout(new FlowLayout(FlowLayout.LEFT));
         p1.setSize(650, 50);
@@ -98,7 +98,38 @@ public class BasicInformation extends JPanel {
         add(p2);
         add(p3);
         add(p4);
-		add(Box.createVerticalGlue());
+        add(Box.createVerticalGlue());
 
     }
+
+    // 加在 class 裡最後面
+
+    public String getName() {
+        return actName.getText();
+    }
+
+    public String getDate() {
+        return date.getText();
+    }
+
+    public String getTime() {
+        return time.getText();
+    }
+
+    public String getPlace() {
+        return place.getText();
+    }
+
+    public String getPrice() {
+        return price.getText();
+    }
+
+    public int getLimitPeople() {
+        try {
+            return Integer.parseInt(limitNumofPeople.getText());
+        } catch (NumberFormatException e) {
+            return 0; // 或回傳預設值
+        }
+    }
+
 }
