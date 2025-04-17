@@ -3,9 +3,7 @@ package org.groupapp;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 public class EditPanel extends JPanel {
 
@@ -58,7 +56,9 @@ public class EditPanel extends JPanel {
         setLayout(new BorderLayout());
 
         JPanel northPanel = new JPanel();
+        northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.X_AXIS));
         northPanel.add(cancel);
+        northPanel.add(Box.createHorizontalGlue());
         northPanel.add(saveDraft);
         add(northPanel, BorderLayout.NORTH);
 
