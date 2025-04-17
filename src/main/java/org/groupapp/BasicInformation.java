@@ -1,7 +1,9 @@
 package org.groupapp;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,25 +33,20 @@ public class BasicInformation extends JPanel {
         placeLabel = new JLabel("Place: ");
         place = new JTextField(10);
 
-        //當online被點選 表示活動在線上 因此不用輸入place
+        //當online被點選 表示活動在線上 因此不用輸入place(還沒成功)
         online = new JRadioButton("online");
         if (online.isSelected()) {
             place.setEnabled(false);
-			revalidate(); // 重新佈局
-			repaint();    // 重繪畫面
         } else {
             place.setEnabled(true);
-			revalidate(); // 重新佈局
-			repaint();    // 重繪畫面
         }
 
-        //當free被點選 表示免費活動 因此不用輸入price
+        //當free被點選 表示免費活動 因此不用輸入price(還沒成功)
         priceLabel = new JLabel("Price: ");
         price = new JTextField(4);
         free = new JRadioButton("free");
         if (free.isSelected()) {
             free.setEnabled(false);
-			
         } else {
             free.setEnabled(true);
         }
@@ -69,6 +66,9 @@ public class BasicInformation extends JPanel {
         p0.setLayout(new FlowLayout(FlowLayout.LEFT));
         p0.add(actName);
 
+		actName.setPreferredSize(new Dimension(0, 20));
+
+		JPanel container = new JPanel();
         JPanel p1 = new JPanel();
         p1.setLayout(new FlowLayout(FlowLayout.LEFT));
         p1.setSize(650, 50);
@@ -98,6 +98,7 @@ public class BasicInformation extends JPanel {
         add(p2);
         add(p3);
         add(p4);
+		add(Box.createVerticalGlue());
 
     }
 }
