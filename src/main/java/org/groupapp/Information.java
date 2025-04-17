@@ -1,5 +1,5 @@
-package org.groupapp;
 
+package org.groupapp;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -56,7 +56,6 @@ public class Information extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
-				new Contact();
 
 			}
 		});
@@ -72,7 +71,6 @@ public class Information extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
-				new Join();
 
 			}
 		});

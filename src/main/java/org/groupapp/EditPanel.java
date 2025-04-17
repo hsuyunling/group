@@ -1,9 +1,11 @@
-package activity;
+package org.groupapp;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
 public class EditPanel extends JPanel {
 

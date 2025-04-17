@@ -1,4 +1,4 @@
-package activity;
+package org.groupapp;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
