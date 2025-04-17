@@ -1,7 +1,15 @@
 
-package  org.groupapp;
-import java.awt.*;
-import javax.swing.*;
+package org.groupapp;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class HomePage extends JFrame {
 
@@ -67,6 +75,7 @@ public class HomePage extends JFrame {
     //頁面最下方
     public void createSouthPanel() {
         southPanel = new JPanel();
+        southPanel.setLayout(new GridLayout(1,4));
         home = new JButton("home");
         following = new JButton("following");
         addActivity = new JButton("+");
