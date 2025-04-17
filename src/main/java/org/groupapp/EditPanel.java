@@ -52,11 +52,11 @@ public class EditPanel extends JPanel {
     
                 int rows = stmt.executeUpdate();
                 if (rows > 0) {
-                    JOptionPane.showMessageDialog(this, "✅ 活動成功新增到資料庫！");
+                    JOptionPane.showMessageDialog(this, "活動成功新增到資料庫！");
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "❌ 資料庫新增失敗：" + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "資料庫新增失敗：" + ex.getMessage());
             }
         });
     }
