@@ -23,6 +23,7 @@ public class EditPanel extends JPanel {
 
     // 建立編輯模式的畫面
     public final void createEditPanel() {
+        
         cancel = new JButton("cancel");
         saveDraft = new JButton("save as a draft");
         back = new JButton("back");
