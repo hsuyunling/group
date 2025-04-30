@@ -69,4 +69,89 @@ public class HomePage extends JFrame {
         addNew = new EditPanel();
         actListPanel = new JPanel();
         followingPanel = new JPanel();
-        personal
+        personalPanel = new JPanel();
+
+        centerPanel.setLayout(cardLayout);
+        centerPanel.add(actListPanel, "home");
+        centerPanel.add(addNew, "addNew");
+        centerPanel.add(followingPanel, "following");
+        centerPanel.add(personalPanel, "my");
+
+        add(centerPanel, BorderLayout.CENTER);
+    }
+
+    // -------------頁面最下方-------------
+    public void createSouthPanel() {
+        southPanel = new JPanel();
+        southPanel.setLayout(new GridLayout(1, 4));
+        home = new JButton("home");
+        following = new JButton("following");
+        addActivity = new JButton("+");
+        personalInfo = new JButton("My");
+        btns.add(home);
+        btns.add(addActivity);
+        btns.add(following);
+        btns.add(personalInfo);
+        setBtnStyle();
+
+        southPanel.setPreferredSize(new Dimension(650, 60));
+
+        add(southPanel, BorderLayout.SOUTH);
+    }
+
+    // -------------btn settings-------------
+    public void setBtnActionListener(JButton btn, String s) {
+        btn.addActionListener(e -> {
+            cardLayout.show(centerPanel, s);
+        });
+    }
+
+    public void setBtnStyle() {
+        Color normalColor = new Color(246, 209, 86);
+        Color pressedColor = new Color(195, 170, 87);
+
+        for (JButton btn : btns) {
+            final JButton thisBtn = btn;
+            thisBtn.setOpaque(true);
+            thisBtn.setBorderPainted(false);
+            thisBtn.setContentAreaFilled(true);
+            thisBtn.setFocusPainted(false);
+
+            thisBtn.setBackground(normalColor);
+            thisBtn.setForeground(Color.BLACK);
+
+            thisBtn.getModel().addChangeListener(e -> {
+                ButtonModel model = thisBtn.getModel();
+                if (model.isPressed()) {
+                    thisBtn.setBackground(pressedColor);
+                    thisBtn.setForeground(Color.WHITE);
+                } else {
+                    thisBtn.setBackground(normalColor);
+                    thisBtn.setForeground(Color.BLACK);
+                }
+            });
+            southPanel.add(thisBtn);
+        }
+    }
+
+    public void searchAction() {
+        String keyword = searchBar.getText().trim();
+        actListPanel.removeAll();
+
+        java.util.List<String> results = DBUtil.searchActivitiesByName(keyword);
+
+        if (results.isEmpty()) {
+            actListPanel.add(new JLabel("沒有找到相關活動"));
+        } else {
+            for (String line : results) {
+                actListPanel.add(new JLabel(line));
+            }
+        }
+
+        searchBar.setText("");
+
+        actListPanel.revalidate();
+        actListPanel.repaint();
+        cardLayout.show(centerPanel, "home");
+    }
+}
