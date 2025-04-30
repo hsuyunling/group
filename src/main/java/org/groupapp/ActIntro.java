@@ -12,6 +12,9 @@ public class ActIntro extends JPanel {
         createLayout();
     }
 
+    public String getIntro() { return introArea.getText(); }
+
+
     	//使用者隨意輸入活動相關資訊（textArea）
 	public void createActIntroPanel(){
 		introLabel = new JLabel("活動簡介");
