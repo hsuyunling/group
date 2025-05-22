@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.List;
 import javax.swing.*;
 
-public class HomePage extends JFrame {
+public class HomePage extends JPanel {
 
     private static final int FRAME_WIDTH = 650;
     private static final int FRAME_HEIGHT = 750;
@@ -27,8 +27,7 @@ public class HomePage extends JFrame {
 
     public HomePage() {
         setLayout(new BorderLayout());
-        setTitle("Group");
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        
 
         imageHome = new ImageIcon(getClass().getResource("/images/home.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
@@ -50,7 +49,7 @@ public class HomePage extends JFrame {
         setBtnActionListener(addActivity, "addNew");
         setBtnActionListener(personalInfo, "my");
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+       
     }
 
     public void setBtnActionListener(JButton btn, String cardName) {

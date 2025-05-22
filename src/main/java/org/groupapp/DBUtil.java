@@ -222,4 +222,17 @@ public class DBUtil {
         }
     }
 
+    public static boolean validateUser(String id, String password) {
+        String sql = "SELECT * FROM user WHERE id = ? AND password = ?";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
