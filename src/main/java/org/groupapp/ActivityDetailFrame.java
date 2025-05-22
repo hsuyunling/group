@@ -7,8 +7,10 @@ import java.util.prefs.Preferences;
 
 public class ActivityDetailFrame extends JFrame {
     private boolean isFavorited;
+    private HomePage parent;
 
-    public ActivityDetailFrame(int activityId, String userId) {
+    public ActivityDetailFrame(int activityId, String userId, HomePage parent) {
+        this.parent = parent;
         Activity act = DBUtil.getActivityById(activityId);
         if (act == null) {
             JOptionPane.showMessageDialog(null, "查無此活動");
@@ -29,7 +31,7 @@ public class ActivityDetailFrame extends JFrame {
 
         JPanel circlePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         circlePanel.add(new JLabel("share"));
-        circlePanel.add(new JLabel("◯"));  // 模擬圓圈
+        circlePanel.add(new JLabel("◯")); // 模擬圓圈
         topPanel.add(circlePanel, BorderLayout.EAST);
 
         add(topPanel, BorderLayout.NORTH);
@@ -39,12 +41,12 @@ public class ActivityDetailFrame extends JFrame {
         infoArea.setEditable(false);
         infoArea.setFont(new Font("微軟正黑體", Font.PLAIN, 14));
         infoArea.setText(
-                "主辦人：王大明\n" +
-                "時間：" + act.getDate() + " " + act.getTime() + "\n" +
-                "地點：" + act.getPlace() + "\n" +
-                "報名截止：" + act.getDueDate() + " " + act.getDueTime() + "\n\n" +
-                "簡介：" + (act.getIntro() == null ? "無提供" : act.getIntro())
-        );
+                "主辦人：" + (act.getHostName() == null ? "未知" : act.getHostName()) + "\n" +
+                        "時間：" + act.getDate() + " " + act.getTime() + "\n" +
+                        "地點：" + act.getPlace() + "\n" +
+                        "報名截止：" + act.getDueDate() + " " + act.getDueTime() + "\n\n" +
+                        "簡介：" + (act.getIntro() == null ? "無提供" : act.getIntro()));
+
         add(new JScrollPane(infoArea), BorderLayout.CENTER);
 
         // 下方按鈕區
@@ -57,11 +59,13 @@ public class ActivityDetailFrame extends JFrame {
         btnFav.setText(isFavorited ? "取消收藏" : "收藏");
 
         btnFav.addActionListener(e -> {
+            boolean changed = false;
             if (isFavorited) {
                 boolean removed = DBUtil.removeFavorite(userId, act.getId());
                 if (removed) {
                     btnFav.setText("收藏");
                     isFavorited = false;
+                    changed = true;
                     JOptionPane.showMessageDialog(this, "已取消收藏");
                 } else {
                     JOptionPane.showMessageDialog(this, "取消收藏失敗");
@@ -71,10 +75,16 @@ public class ActivityDetailFrame extends JFrame {
                 if (added) {
                     btnFav.setText("取消收藏");
                     isFavorited = true;
+                    changed = true;
                     JOptionPane.showMessageDialog(this, "已加入收藏");
                 } else {
                     JOptionPane.showMessageDialog(this, "收藏失敗或已收藏過");
                 }
+            }
+
+            // ★ 若狀態改變就刷新主畫面
+            if (changed && parent != null) {
+                parent.refreshActivityList();
             }
         });
 

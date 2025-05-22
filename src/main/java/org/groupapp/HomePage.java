@@ -1,4 +1,5 @@
 package org.groupapp;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.prefs.Preferences;
@@ -53,7 +54,14 @@ public class HomePage extends JFrame {
     }
 
     public void setBtnActionListener(JButton btn, String cardName) {
-        btn.addActionListener(e -> cardLayout.show(centerPanel, cardName));
+        btn.addActionListener(e -> {
+            if ("following".equals(cardName)) {
+                centerPanel.remove(followingPanel); // 先移除舊的
+                followingPanel = new FollowingPanel(); // 建立新的
+                centerPanel.add(followingPanel, "following"); // 加入新的
+            }
+            cardLayout.show(centerPanel, cardName); // 切換畫面
+        });
     }
 
     public void createNorthPanel() {
@@ -82,38 +90,39 @@ public class HomePage extends JFrame {
     }
 
     public void createCenterPanel() {
-    centerPanel = new JPanel();
-    centerPanel.setLayout(cardLayout);
+        centerPanel = new JPanel();
+        centerPanel.setLayout(cardLayout);
 
-    actListPanel = new JPanel();
-    actListPanel.setLayout(new BoxLayout(actListPanel, BoxLayout.Y_AXIS));
-    actListPanel.setBackground(Color.WHITE);
+        actListPanel = new JPanel();
+        actListPanel.setLayout(new BoxLayout(actListPanel, BoxLayout.Y_AXIS));
+        actListPanel.setBackground(Color.WHITE);
 
-    List<Activity> activities = DBUtil.getAllActivities();
-    String userId = ActivityDetailFrame.getCurrentUserId();
-    Set<Integer> favoriteIds = (userId != null) ? DBUtil.getFavoriteActivityIds(userId) : new HashSet<>();
+        List<Activity> activities = DBUtil.getAllActivities();
+        String userId = ActivityDetailFrame.getCurrentUserId();
+        Set<Integer> favoriteIds = (userId != null) ? DBUtil.getFavoriteActivityIds(userId) : new HashSet<>();
 
-    if (activities.isEmpty()) {
-        actListPanel.add(new JLabel("目前沒有活動"));
-    } else {
-        for (Activity act : activities) {
-            boolean isFavorited = favoriteIds.contains(act.getId());
-            actListPanel.add(createActCard(act, isFavorited));
-            actListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        if (activities.isEmpty()) {
+            actListPanel.add(new JLabel("目前沒有活動"));
+        } else {
+            for (Activity act : activities) {
+                boolean isFavorited = favoriteIds.contains(act.getId());
+                actListPanel.add(createActCard(act, isFavorited));
+                actListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            }
         }
+
+        addNew = new EditPanel();
+        followingPanel = new FollowingPanel();
+
+        personalPanel = new JPanel();
+
+        centerPanel.add(actListPanel, "home");
+        centerPanel.add(addNew, "addNew");
+        centerPanel.add(followingPanel, "following");
+        centerPanel.add(personalPanel, "my");
+
+        add(centerPanel, BorderLayout.CENTER);
     }
-
-    addNew = new EditPanel();
-    followingPanel = new JPanel();
-    personalPanel = new JPanel();
-
-    centerPanel.add(actListPanel, "home");
-    centerPanel.add(addNew, "addNew");
-    centerPanel.add(followingPanel, "following");
-    centerPanel.add(personalPanel, "my");
-
-    add(centerPanel, BorderLayout.CENTER);
-}
 
     public void createSouthPanel() {
         southPanel = new JPanel();
@@ -151,38 +160,36 @@ public class HomePage extends JFrame {
         add(southPanel, BorderLayout.SOUTH);
     }
 
-   private JPanel createActCard(Activity act, boolean isFavorited) {
-    JPanel panel = new JPanel(new BorderLayout());
-    panel.setPreferredSize(new Dimension(600, 100));
-    panel.setMaximumSize(new Dimension(600, 100));
-    panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-    panel.setBackground(new Color(250, 250, 250));
+    private JPanel createActCard(Activity act, boolean isFavorited) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setPreferredSize(new Dimension(600, 100));
+        panel.setMaximumSize(new Dimension(600, 100));
+        panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        panel.setBackground(new Color(250, 250, 250));
 
-    String title = String.format(
-        "<html><b>%s%s</b><br>時間：%s %s<br>地點：%s</html>",
-        isFavorited ? "★ " : "",
-        act.getName(), act.getDate(), act.getTime(), act.getPlace()
-    );
+        String title = String.format(
+                "<html><b>%s%s</b><br>時間：%s %s<br>地點：%s</html>",
+                isFavorited ? "★ " : "",
+                act.getName(), act.getDate(), act.getTime(), act.getPlace());
 
-    JLabel label = new JLabel(title);
-    label.setFont(font);
-    label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    panel.add(label, BorderLayout.CENTER);
+        JLabel label = new JLabel(title);
+        label.setFont(font);
+        label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.add(label, BorderLayout.CENTER);
 
-    panel.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            String userId = ActivityDetailFrame.getCurrentUserId();
-            if (userId == null) {
-                JOptionPane.showMessageDialog(null, "尚未登入，請先登入");
-                return;
+        panel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                String userId = ActivityDetailFrame.getCurrentUserId();
+                if (userId == null) {
+                    JOptionPane.showMessageDialog(null, "尚未登入，請先登入");
+                    return;
+                }
+                new ActivityDetailFrame(act.getId(), userId, HomePage.this).setVisible(true);
             }
-            new ActivityDetailFrame(act.getId(), userId).setVisible(true);
-        }
-    });
+        });
 
-    return panel;
-}
-
+        return panel;
+    }
 
     public void setBtnStyle() {
         Color normalColor = new Color(246, 209, 86);
@@ -209,4 +216,22 @@ public class HomePage extends JFrame {
             southPanel.add(thisBtn);
         }
     }
+
+    public void refreshActivityList() {
+        actListPanel.removeAll();
+
+        List<Activity> activities = DBUtil.getAllActivities();
+        String userId = ActivityDetailFrame.getCurrentUserId();
+        Set<Integer> favoriteIds = (userId != null) ? DBUtil.getFavoriteActivityIds(userId) : new HashSet<>();
+
+        for (Activity act : activities) {
+            boolean isFavorited = favoriteIds.contains(act.getId());
+            actListPanel.add(createActCard(act, isFavorited));
+            actListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        }
+
+        actListPanel.revalidate();
+        actListPanel.repaint();
+    }
+
 }

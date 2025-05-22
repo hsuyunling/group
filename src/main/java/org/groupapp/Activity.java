@@ -9,6 +9,7 @@ public class Activity {
     private String intro;
     private String dueDate;
     private String dueTime;
+    private String hostName;
 
     // Getter & Setter
     public int getId() {
@@ -74,5 +75,13 @@ public class Activity {
 
     public void setDueTime(String dueTime) {
         this.dueTime = dueTime;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
     }
 }

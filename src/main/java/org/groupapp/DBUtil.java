@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DBUtil {
@@ -144,11 +146,12 @@ public class DBUtil {
 
     public static Activity getActivityById(int activityId) {
         Activity act = null;
-        String sql = "SELECT * FROM activity WHERE id = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "SELECT a.*, u.name AS host_name FROM activity a LEFT JOIN user u ON a.host_id = u.id WHERE a.id = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, activityId);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
                 act = new Activity();
                 act.setId(rs.getInt("id"));
@@ -159,11 +162,38 @@ public class DBUtil {
                 act.setIntro(rs.getString("intro"));
                 act.setDueDate(rs.getString("due_date"));
                 act.setDueTime(rs.getString("due_time"));
+                act.setHostName(rs.getString("host_name")); // ← 主辦人名稱
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return act;
+    }
+
+    public static List<Activity> getRegisteredActivities(String userId) {
+        List<Activity> list = new ArrayList<>();
+        String sql = "SELECT a.* FROM registration r JOIN activity a ON r.activity_id = a.id WHERE r.user_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Activity act = new Activity();
+                act.setId(rs.getInt("id"));
+                act.setName(rs.getString("name"));
+                act.setDate(rs.getString("date"));
+                act.setTime(rs.getString("time"));
+                act.setPlace(rs.getString("place"));
+                act.setIntro(rs.getString("intro"));
+                act.setDueDate(rs.getString("due_date"));
+                act.setDueTime(rs.getString("due_time"));
+                list.add(act);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return act;
+        return list;
     }
 
 }
