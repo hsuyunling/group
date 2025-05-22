@@ -64,13 +64,27 @@ public class HomePage extends JFrame {
     // -------------頁面最上方-------------
     public void createNorthPanel() {
         northPanel = new JPanel();
-        searchBar = new JTextField(10);
-        searchBtn = new JButton("查詢");
-        // searchBtn.addActionListener(e -> searchAction());
+        northPanel.setLayout(new BorderLayout());
 
-        northPanel.add(searchBar);
-        northPanel.add(searchBtn);
-        northPanel.setBackground(Color.gray);
+        // 左上 LOGO + 漢堡選單
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton menuBtn = new JButton("≡");
+        JLabel logoLabel = new JLabel("LOGO");
+        logoPanel.add(menuBtn);
+        logoPanel.add(logoLabel);
+
+        // 中間三個分類按鈕（全部、活動、揪團）
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton btnAll = new JButton("全部");
+        JButton btnAct = new JButton("活動");
+        JButton btnGroup = new JButton("揪團");
+        filterPanel.add(btnAll);
+        filterPanel.add(btnAct);
+        filterPanel.add(btnGroup);
+
+        northPanel.add(logoPanel, BorderLayout.WEST);
+        northPanel.add(filterPanel, BorderLayout.SOUTH);
+        northPanel.setBackground(new Color(230, 230, 230));
 
         add(northPanel, BorderLayout.NORTH);
     }
@@ -78,12 +92,21 @@ public class HomePage extends JFrame {
     // -------------頁面中間--------------
     public void createCenterPanel() {
         centerPanel = new JPanel();
-        addNew = new EditPanel();
+        centerPanel.setLayout(cardLayout);
+
+        // 首頁活動列表
         actListPanel = new JPanel();
+        actListPanel.setLayout(new BoxLayout(actListPanel, BoxLayout.Y_AXIS));
+        actListPanel.setBackground(Color.WHITE);
+        actListPanel.add(createActCard("Act 1"));
+        actListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        actListPanel.add(createActCard("Act 2"));
+
+        // 其他頁面留空或自定義
+        addNew = new EditPanel();
         followingPanel = new JPanel();
         personalPanel = new JPanel();
 
-        centerPanel.setLayout(cardLayout);
         centerPanel.add(actListPanel, "home");
         centerPanel.add(addNew, "addNew");
         centerPanel.add(followingPanel, "following");
@@ -129,6 +152,21 @@ public class HomePage extends JFrame {
 
         southPanel.setPreferredSize(new Dimension(650, 60));
         add(southPanel, BorderLayout.SOUTH);
+    }
+
+    private JPanel createActCard(String title) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setPreferredSize(new Dimension(600, 100));
+        panel.setMaximumSize(new Dimension(600, 100));
+        panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        panel.setBackground(new Color(250, 250, 250));
+
+        JLabel label = new JLabel(title);
+        label.setFont(font);
+        label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.add(label, BorderLayout.CENTER);
+        return panel;
     }
 
     public void setBtnStyle() {

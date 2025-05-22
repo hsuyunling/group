@@ -3,15 +3,10 @@ org\groupapp\DBUtil.class
 org\groupapp\Settings$1.class
 org\groupapp\ActIntro.class
 org\groupapp\EditPanel.class
-org\groupapp\Information$2.class
 org\groupapp\Main.class
-org\groupapp\Information$3.class
 org\groupapp\KeepPage.class
 org\groupapp\BasicInformation.class
-org\groupapp\Information.class
-org\groupapp\Information$4.class
 org\groupapp\Contact$1.class
 org\groupapp\Join.class
 org\groupapp\Contact.class
-org\groupapp\Information$1.class
 org\groupapp\HomePage.class
