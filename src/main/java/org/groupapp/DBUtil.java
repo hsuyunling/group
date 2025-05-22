@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DBUtil {
     private static final String SERVER = "jdbc:mysql://140.119.19.73:3315/";
@@ -42,6 +44,126 @@ public class DBUtil {
         }
 
         return results;
+    }
+
+    public static boolean registerUserToActivityIfNotExists(String userId, int activityId) {
+        String checkSql = "SELECT * FROM registration WHERE user_id = ? AND activity_id = ?";
+        String insertSql = "INSERT INTO registration (user_id, activity_id) VALUES (?, ?)";
+
+        try (Connection conn = getConnection();
+                PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+
+            checkStmt.setString(1, userId);
+            checkStmt.setInt(2, activityId);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("⚠️ 使用者已報名此活動！");
+                return false;
+            }
+
+            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                insertStmt.setString(1, userId);
+                insertStmt.setInt(2, activityId);
+                insertStmt.executeUpdate();
+                return true;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("❌ 報名失敗：" + e.getMessage());
+            return false;
+        }
+    }
+
+    public static java.util.List<Activity> getAllActivities() {
+        java.util.List<Activity> list = new java.util.ArrayList<>();
+
+        String sql = "SELECT id, name, date, time, place FROM activity";
+
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Activity act = new Activity();
+                act.setId(rs.getInt("id"));
+                act.setName(rs.getString("name"));
+                act.setDate(rs.getString("date"));
+                act.setTime(rs.getString("time"));
+                act.setPlace(rs.getString("place"));
+                list.add(act);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public static boolean addFavorite(String userId, int activityId) {
+        String sql = "INSERT INTO favorite (user_id, activity_id) VALUES (?, ?)";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            stmt.setInt(2, activityId);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("收藏失敗：" + e.getMessage());
+            return false;
+        }
+    }
+
+    public static Set<Integer> getFavoriteActivityIds(String userId) {
+        Set<Integer> favoriteIds = new HashSet<>();
+        String sql = "SELECT activity_id FROM favorite WHERE user_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                favoriteIds.add(rs.getInt("activity_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return favoriteIds;
+    }
+
+    public static boolean removeFavorite(String userId, int activityId) {
+        String sql = "DELETE FROM favorite WHERE user_id = ? AND activity_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            stmt.setInt(2, activityId);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.out.println("取消收藏失敗：" + e.getMessage());
+            return false;
+        }
+    }
+
+    public static Activity getActivityById(int activityId) {
+        Activity act = null;
+        String sql = "SELECT * FROM activity WHERE id = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, activityId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                act = new Activity();
+                act.setId(rs.getInt("id"));
+                act.setName(rs.getString("name"));
+                act.setDate(rs.getString("date"));
+                act.setTime(rs.getString("time"));
+                act.setPlace(rs.getString("place"));
+                act.setIntro(rs.getString("intro"));
+                act.setDueDate(rs.getString("due_date"));
+                act.setDueTime(rs.getString("due_time"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return act;
     }
 
 }
