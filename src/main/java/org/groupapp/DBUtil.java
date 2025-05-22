@@ -196,4 +196,30 @@ public class DBUtil {
         return list;
     }
 
+    public static boolean cancelRegistration(String userId, int activityId) {
+        String sql = "DELETE FROM registration WHERE user_id = ? AND activity_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            stmt.setInt(2, activityId);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean isUserRegistered(String userId, int activityId) {
+        String sql = "SELECT 1 FROM registration WHERE user_id = ? AND activity_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            stmt.setInt(2, activityId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
