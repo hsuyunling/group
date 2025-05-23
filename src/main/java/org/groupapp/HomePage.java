@@ -67,7 +67,7 @@ public class HomePage extends JPanel {
 
        
     }
-
+// ---------------切換主頁面-------------------
     public void setBtnActionListener(JButton btn, String cardName) {
         btn.addActionListener(e -> {
             if ("following".equals(cardName)) {
@@ -79,8 +79,12 @@ public class HomePage extends JPanel {
         });
     }
 
+// ---------------主頁面-------------------
     public void createCenterPanel() {
         northPanel = new JPanel();
+        JPanel homePanel = new JPanel();
+        homePanel.setLayout(new BorderLayout());
+        homePanel.add(northPanel, BorderLayout.NORTH);
 
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton btnAll = new JButton("全部");
@@ -123,14 +127,16 @@ public class HomePage extends JPanel {
 
         personalPanel = new JPanel();
 
-        centerPanel.add(actListPanel, "home");
+        centerPanel.add(homePanel, "home");
         centerPanel.add(addNew, "addNew");
         centerPanel.add(followingPanel, "following");
         centerPanel.add(personalPanel, "my");
 
-        add(centerPanel, BorderLayout.CENTER);
+        homePanel.add(actListPanel, BorderLayout.CENTER);
+        add(centerPanel);
     }
 
+// ---------------底下的四個按鈕-------------------
     public void createSouthPanel() {
         southPanel = new JPanel();
         southPanel.setLayout(new GridLayout(1, 4));
@@ -167,6 +173,7 @@ public class HomePage extends JPanel {
         add(southPanel, BorderLayout.SOUTH);
     }
 
+// ---------------中間的活動-------------------
     private JPanel createActCard(Activity act, boolean isFavorited) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setPreferredSize(new Dimension(600, 100));
@@ -198,11 +205,13 @@ public class HomePage extends JPanel {
         return panel;
     }
 
+// ---------------按鈕形式-------------------
     public void setBtnStyle() {
         Color normalColor = new Color(246, 209, 86);
         Color pressedColor = new Color(195, 170, 87);
         Font f = new Font("Calibri", Font.PLAIN, 18);
 
+// ---------------底下四個按鈕-------------------
         for (JButton btn : btns) {
             final JButton thisBtn = btn;
             thisBtn.setOpaque(true);
@@ -223,6 +232,7 @@ public class HomePage extends JPanel {
             southPanel.add(thisBtn);
         }
 
+// ---------------主頁面上面三個按鈕-------------------
         for (JButton btn : topbtns) {
             final JButton thisBtn = btn;
             thisBtn.setOpaque(true);
