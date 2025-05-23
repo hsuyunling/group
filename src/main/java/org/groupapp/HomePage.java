@@ -128,7 +128,7 @@ public class HomePage extends JPanel {
         personalPanel = new JPanel();
 
         centerPanel.add(homePanel, "home");
-        centerPanel.add(addNew, "addNew");
+        centerPanel.add(addNew, "addNew"); //連接EditPanel
         centerPanel.add(followingPanel, "following");
         centerPanel.add(personalPanel, "my");
 

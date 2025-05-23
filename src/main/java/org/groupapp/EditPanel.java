@@ -3,7 +3,12 @@ package org.groupapp;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 public class EditPanel extends JPanel {
 
@@ -14,18 +19,16 @@ public class EditPanel extends JPanel {
     private java.util.List<String> cardNames = List.of("BasicInformation", "ActIntro", "Settings");
     private int currentIndex = 0;
 
-    private JButton cancel, saveDraft, back, next, confirm;
+    private JButton back, next, confirm;
 
     public EditPanel() {
         createEditPanel();
         createLayout();
     }
 
-    // 建立編輯模式的畫面
+// ------------------建立編輯模式的畫面------------------
     public final void createEditPanel() {
 
-        cancel = new JButton("cancel");
-        saveDraft = new JButton("save as a draft");
         back = new JButton("back");
         next = new JButton("next");
         confirm = new JButton("confirm");
@@ -38,7 +41,6 @@ public class EditPanel extends JPanel {
                 // 向子元件索取資料
                 BasicInformation info = (BasicInformation) basicInformation;
                 ActIntro intro = (ActIntro) actIntro;
-                Settings set = (Settings) settings;
     
                 stmt.setString(1, info.getName());
                 stmt.setString(2, info.getDate());
@@ -46,8 +48,6 @@ public class EditPanel extends JPanel {
                 stmt.setString(4, info.getPlace());
                 stmt.setString(5, info.getPrice());
                 stmt.setInt(6, info.getLimitPeople());
-                stmt.setString(7, set.getDueDate());
-                stmt.setString(8, set.getDueTime());
                 stmt.setString(9, intro.getIntro());
     
                 int rows = stmt.executeUpdate();
@@ -61,12 +61,11 @@ public class EditPanel extends JPanel {
         });
     }
     
-
+// ------------------建立切換畫面------------------
     public JPanel createCardLayoutPanel() {
         cardLayoutPanel = new JPanel();
         basicInformation = new BasicInformation();
         actIntro = new ActIntro();
-        settings = new Settings();
 
         cardLayoutPanel.setLayout(cardLayout);
 
@@ -75,9 +74,6 @@ public class EditPanel extends JPanel {
 
         // createActIntroPanel();
         cardLayoutPanel.add(actIntro, "ActIntro");
-
-        // createActSettingsPanel();
-        cardLayoutPanel.add(settings, "Settings");
 
         cardLayout.show(cardLayoutPanel, "basicInformation");
 
@@ -89,9 +85,7 @@ public class EditPanel extends JPanel {
 
         JPanel northPanel = new JPanel();
         northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.X_AXIS));
-        northPanel.add(cancel);
         northPanel.add(Box.createHorizontalGlue());
-        northPanel.add(saveDraft);
         add(northPanel, BorderLayout.NORTH);
 
         JPanel southPanel = new JPanel();
