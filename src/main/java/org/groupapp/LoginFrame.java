@@ -1,12 +1,29 @@
 package org.groupapp;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.prefs.Preferences;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+
 public class LoginFrame extends JFrame {
+    JPanel topP, middleP, bottomP;
 
     public LoginFrame() {
         setTitle("登入系統");
@@ -36,7 +53,7 @@ public class LoginFrame extends JFrame {
         // --- 密碼欄位 ---
         JPasswordField pwdField = new JPasswordField();
         styleInput(pwdField);
-        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(Box.createVerticalStrut(5));
         mainPanel.add(new JLabel("密碼"));
         mainPanel.add(pwdField);
 
@@ -86,5 +103,9 @@ public class LoginFrame extends JFrame {
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         field.setFont(new Font("Arial", Font.PLAIN, 14));
         field.setMargin(new Insets(5, 8, 5, 8));
+    }
+
+    public void setLayout(){
+        
     }
 }

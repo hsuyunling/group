@@ -1,9 +1,19 @@
 package org.groupapp;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 public class BasicInformation extends JPanel {
 
@@ -18,6 +28,13 @@ public class BasicInformation extends JPanel {
     private JLabel dueLabel, payLabel, contactLabel;
     private JCheckBox cash, card;
     private int contactCount = 0;
+
+
+    ArrayList<JTextField> tf = new ArrayList<>();
+
+    // --------colors----------
+    Color normalColor = new Color(246, 209, 86);
+    Color pressedColor = new Color(195, 170, 87);
 
     public BasicInformation() {
         createBasicInformationPanel();
@@ -46,7 +63,7 @@ public class BasicInformation extends JPanel {
 
         // 當free被點選 表示免費活動 因此不用輸入price(還沒成功)
         priceLabel = new JLabel("Price: ");
-        price = new JTextField(4);
+        price = new JTextField(10);
         free = new JRadioButton("free");
         if (free.isSelected()) {
             free.setEnabled(false);
@@ -55,7 +72,7 @@ public class BasicInformation extends JPanel {
         }
 
         limitLabel = new JLabel("Limit: ");
-        limitNumofPeople = new JTextField(4);
+        limitNumofPeople = new JTextField(10);
 
 
         // --------settings----------
@@ -201,6 +218,28 @@ public class BasicInformation extends JPanel {
         add(ps3);
 
     }
+
+    // public void setBtnStyle(){
+        
+    //         for (JTextField tf : tf) {
+    //         final JTextField thisBtn = btn;
+    //         thisBtn.setOpaque(true);
+    //         thisBtn.setBorderPainted(false);
+    //         thisBtn.setContentAreaFilled(true);
+    //         thisBtn.setFocusPainted(false);
+
+    //         thisBtn.setBackground(normalColor);
+
+    //         thisBtn.getModel().addChangeListener(e -> {
+    //             ButtonModel model = thisBtn.getModel();
+    //             if (model.isPressed()) {
+    //                 thisBtn.setBackground(pressedColor);
+    //             } else {
+    //                 thisBtn.setBackground(normalColor);
+    //             }
+    //         });
+    //     }
+    // }
 
     // 加在 class 裡最後面
 

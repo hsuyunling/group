@@ -2,10 +2,13 @@ package org.groupapp;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -16,10 +19,11 @@ public class EditPanel extends JPanel {
     private BorderLayout borderLayout = new BorderLayout();
     private JPanel cardLayoutPanel, basicInformation, actIntro, settings;
     private String currentCard;
-    private java.util.List<String> cardNames = List.of("BasicInformation", "ActIntro", "Settings");
+    private java.util.List<String> cardNames = List.of("BasicInformation", "ActIntro");
     private int currentIndex = 0;
 
     private JButton back, next, confirm;
+    ArrayList<JButton> btns = new ArrayList<>();
 
     public EditPanel() {
         createEditPanel();
@@ -121,4 +125,29 @@ public class EditPanel extends JPanel {
         confirm.setVisible(currentIndex == cardNames.size() - 1);
     }
 
+    public void setBtnStyle() {
+        Color normalColor = new Color(246, 209, 86);
+        Color pressedColor = new Color(195, 170, 87);
+        btns.add(next);
+        btns.add(back);
+        btns.add(confirm);
+        for (JButton btn : btns) {
+            final JButton thisBtn = btn;
+            thisBtn.setOpaque(true);
+            thisBtn.setBorderPainted(false);
+            thisBtn.setContentAreaFilled(true);
+            thisBtn.setFocusPainted(false);
+
+            thisBtn.setBackground(normalColor);
+
+            thisBtn.getModel().addChangeListener(e -> {
+                ButtonModel model = thisBtn.getModel();
+                if (model.isPressed()) {
+                    thisBtn.setBackground(pressedColor);
+                } else {
+                    thisBtn.setBackground(normalColor);
+                }
+            });
+        }
+    }
 }
