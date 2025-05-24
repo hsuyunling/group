@@ -1,14 +1,29 @@
 package org.groupapp;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.prefs.Preferences;
-
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.util.ArrayList;
-
-import java.awt.*;
+import java.util.HashSet;
 import java.util.List;
-import javax.swing.*;
+import java.util.Set;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class HomePage extends JPanel {
 
@@ -21,6 +36,8 @@ public class HomePage extends JPanel {
     JTextField searchBar;
     Font font = new Font("Arial", Font.PLAIN, 20);
     ArrayList<JButton> btns = new ArrayList<>();
+    ArrayList<JButton> topbtns = new ArrayList<>();
+
 
     // 圖片
     Image imageHome, imageFollowing, imageAddNew, imageInfo;
@@ -38,7 +55,6 @@ public class HomePage extends JPanel {
         imageInfo = new ImageIcon(getClass().getResource("/images/personalInfo.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
 
-        createNorthPanel();
         createCenterPanel();
         createSouthPanel();
 
@@ -51,7 +67,7 @@ public class HomePage extends JPanel {
 
        
     }
-
+// ---------------切換主頁面-------------------
     public void setBtnActionListener(JButton btn, String cardName) {
         btn.addActionListener(e -> {
             if ("following".equals(cardName)) {
@@ -63,32 +79,28 @@ public class HomePage extends JPanel {
         });
     }
 
-    public void createNorthPanel() {
+// ---------------主頁面-------------------
+    public void createCenterPanel() {
         northPanel = new JPanel();
-        northPanel.setLayout(new BorderLayout());
+        JPanel homePanel = new JPanel();
+        homePanel.setLayout(new BorderLayout());
+        homePanel.add(northPanel, BorderLayout.NORTH);
 
-        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton menuBtn = new JButton("≡");
-        JLabel logoLabel = new JLabel("LOGO");
-        logoPanel.add(menuBtn);
-        logoPanel.add(logoLabel);
-
-        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton btnAll = new JButton("全部");
         JButton btnAct = new JButton("活動");
         JButton btnGroup = new JButton("揪團");
         filterPanel.add(btnAll);
         filterPanel.add(btnAct);
         filterPanel.add(btnGroup);
+        topbtns.add(btnAll);
+        topbtns.add(btnAct);
+        topbtns.add(btnGroup);
 
-        northPanel.add(logoPanel, BorderLayout.WEST);
-        northPanel.add(filterPanel, BorderLayout.SOUTH);
-        northPanel.setBackground(new Color(230, 230, 230));
+        filterPanel.setBackground(Color.WHITE);
+        northPanel.setBackground(Color.WHITE);
 
-        add(northPanel, BorderLayout.NORTH);
-    }
-
-    public void createCenterPanel() {
+        northPanel.add(filterPanel);
         centerPanel = new JPanel();
         centerPanel.setLayout(cardLayout);
 
@@ -115,14 +127,16 @@ public class HomePage extends JPanel {
 
         personalPanel = new JPanel();
 
-        centerPanel.add(actListPanel, "home");
+        centerPanel.add(homePanel, "home");
         centerPanel.add(addNew, "addNew");
         centerPanel.add(followingPanel, "following");
         centerPanel.add(personalPanel, "my");
 
-        add(centerPanel, BorderLayout.CENTER);
+        homePanel.add(actListPanel, BorderLayout.CENTER);
+        add(centerPanel);
     }
 
+// ---------------底下的四個按鈕-------------------
     public void createSouthPanel() {
         southPanel = new JPanel();
         southPanel.setLayout(new GridLayout(1, 4));
@@ -159,6 +173,7 @@ public class HomePage extends JPanel {
         add(southPanel, BorderLayout.SOUTH);
     }
 
+// ---------------中間的活動-------------------
     private JPanel createActCard(Activity act, boolean isFavorited) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setPreferredSize(new Dimension(600, 100));
@@ -190,11 +205,13 @@ public class HomePage extends JPanel {
         return panel;
     }
 
+// ---------------按鈕形式-------------------
     public void setBtnStyle() {
         Color normalColor = new Color(246, 209, 86);
         Color pressedColor = new Color(195, 170, 87);
         Font f = new Font("Calibri", Font.PLAIN, 18);
 
+// ---------------底下四個按鈕-------------------
         for (JButton btn : btns) {
             final JButton thisBtn = btn;
             thisBtn.setOpaque(true);
@@ -213,6 +230,26 @@ public class HomePage extends JPanel {
                 }
             });
             southPanel.add(thisBtn);
+        }
+
+// ---------------主頁面上面三個按鈕-------------------
+        for (JButton btn : topbtns) {
+            final JButton thisBtn = btn;
+            thisBtn.setOpaque(true);
+            thisBtn.setBorderPainted(false);
+            thisBtn.setContentAreaFilled(true);
+            thisBtn.setFocusPainted(false);
+
+            thisBtn.setBackground(normalColor);
+
+            thisBtn.getModel().addChangeListener(e -> {
+                ButtonModel model = thisBtn.getModel();
+                if (model.isPressed()) {
+                    thisBtn.setBackground(pressedColor);
+                } else {
+                    thisBtn.setBackground(normalColor);
+                }
+            });
         }
     }
 
