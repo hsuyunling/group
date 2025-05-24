@@ -114,7 +114,7 @@ private JPanel createLoginPanel() {
     loginBtn.setMaximumSize(new Dimension(100, 40));
     loginBtn.setFont(new Font("Arial", Font.BOLD, 16));
     loginBtn.setBackground(new Color(246, 209, 86));
-    loginBtn.setForeground(Color.WHITE);
+    loginBtn.setForeground(Color.black);
     loginBtn.setFocusPainted(false);
     loginBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
     loginBtn.setOpaque(true);
