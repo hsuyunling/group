@@ -47,7 +47,7 @@ public class FollowingPanel extends JPanel {
         boolean hasFav = false;
         for (Activity act : all) {
             if (favIds.contains(act.getId())) {
-                favoritePanel.add(createActCard(act, false, userId, null));
+                favoritePanel.add(createActCard(act, false, userId, this::reload));
                 favoritePanel.add(Box.createRigidArea(new Dimension(0, 10)));
                 hasFav = true;
             }
@@ -92,6 +92,7 @@ public class FollowingPanel extends JPanel {
             boolean alreadyRegistered = DBUtil.isUserRegistered(userId, act.getId());
             JButton joinBtn = new JButton(alreadyRegistered ? "已報名" : "報名");
             joinBtn.setEnabled(!alreadyRegistered);
+            
 
             joinBtn.addActionListener(e -> {
                 boolean success = DBUtil.registerUserToActivityIfNotExists(userId, act.getId());
