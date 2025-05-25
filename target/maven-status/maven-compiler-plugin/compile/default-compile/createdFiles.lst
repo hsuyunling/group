@@ -1,0 +1,12 @@
+org\groupapp\Settings.class
+org\groupapp\ActIntro.class
+org\groupapp\EditPanel.class
+org\groupapp\Main.class
+org\groupapp\KeepPage.class
+org\groupapp\Contact$1.class
+org\groupapp\Join.class
+org\groupapp\Contact.class
+org\groupapp\HomePage.class
+org\groupapp\DBUtil.class
+org\groupapp\Settings$1.class
+org\groupapp\BasicInformation.class
