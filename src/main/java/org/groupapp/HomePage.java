@@ -38,13 +38,11 @@ public class HomePage extends JPanel {
     ArrayList<JButton> btns = new ArrayList<>();
     ArrayList<JButton> topbtns = new ArrayList<>();
 
-
     // 圖片
     Image imageHome, imageFollowing, imageAddNew, imageInfo;
 
     public HomePage() {
         setLayout(new BorderLayout());
-        
 
         imageHome = new ImageIcon(getClass().getResource("/images/home.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
@@ -65,9 +63,9 @@ public class HomePage extends JPanel {
         setBtnActionListener(addActivity, "addNew");
         setBtnActionListener(personalInfo, "my");
 
-       
     }
-// ---------------切換主頁面-------------------
+
+    // ---------------切換主頁面-------------------
     public void setBtnActionListener(JButton btn, String cardName) {
         btn.addActionListener(e -> {
             if ("following".equals(cardName)) {
@@ -79,7 +77,7 @@ public class HomePage extends JPanel {
         });
     }
 
-// ---------------主頁面-------------------
+    // ---------------主頁面-------------------
     public void createCenterPanel() {
         northPanel = new JPanel();
         JPanel homePanel = new JPanel();
@@ -128,15 +126,17 @@ public class HomePage extends JPanel {
         personalPanel = new JPanel();
 
         centerPanel.add(homePanel, "home");
-        centerPanel.add(addNew, "addNew"); //連接EditPanel
+        centerPanel.add(addNew, "addNew"); // 連接EditPanel
         centerPanel.add(followingPanel, "following");
         centerPanel.add(personalPanel, "my");
+        //centerPanel.add(new KeepPanel(), "keep");
 
         homePanel.add(actListPanel, BorderLayout.CENTER);
         add(centerPanel);
+
     }
 
-// ---------------底下的四個按鈕-------------------
+    // ---------------底下的四個按鈕-------------------
     public void createSouthPanel() {
         southPanel = new JPanel();
         southPanel.setLayout(new GridLayout(1, 4));
@@ -173,7 +173,7 @@ public class HomePage extends JPanel {
         add(southPanel, BorderLayout.SOUTH);
     }
 
-// ---------------中間的活動-------------------
+    // ---------------中間的活動-------------------
     private JPanel createActCard(Activity act, boolean isFavorited) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setPreferredSize(new Dimension(600, 100));
@@ -205,13 +205,13 @@ public class HomePage extends JPanel {
         return panel;
     }
 
-// ---------------按鈕形式-------------------
+    // ---------------按鈕形式-------------------
     public void setBtnStyle() {
         Color normalColor = new Color(246, 209, 86);
         Color pressedColor = new Color(195, 170, 87);
         Font f = new Font("Calibri", Font.PLAIN, 18);
 
-// ---------------底下四個按鈕-------------------
+        // ---------------底下四個按鈕-------------------
         for (JButton btn : btns) {
             final JButton thisBtn = btn;
             thisBtn.setOpaque(true);
@@ -232,7 +232,7 @@ public class HomePage extends JPanel {
             southPanel.add(thisBtn);
         }
 
-// ---------------主頁面上面三個按鈕-------------------
+        // ---------------主頁面上面三個按鈕-------------------
         for (JButton btn : topbtns) {
             final JButton thisBtn = btn;
             thisBtn.setOpaque(true);
