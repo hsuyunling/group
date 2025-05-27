@@ -166,7 +166,7 @@ public class KeepPanel extends JPanel {
                 doneContent.add(card);
             }
             // 間隔
-            eventsContent.add(Box.createRigidArea(new Dimension(0,5));
+            eventsContent.add(Box.createRigidArea(new Dimension(0,5)));
         }
     }
 
