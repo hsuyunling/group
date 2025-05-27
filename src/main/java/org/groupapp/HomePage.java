@@ -90,9 +90,11 @@ public class HomePage extends JPanel {
         JButton btnAll = new JButton("全部");
         JButton btnAct = new JButton("活動");
         JButton btnGroup = new JButton("揪團");
+        // panel
         filterPanel.add(btnAll);
         filterPanel.add(btnAct);
         filterPanel.add(btnGroup);
+        // arrayList
         topbtns.add(btnAll);
         topbtns.add(btnAct);
         topbtns.add(btnGroup);

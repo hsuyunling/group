@@ -117,6 +117,10 @@ public class EditPanel extends JPanel {
                 updateButtonVisibility();
             }
         });
+
+        setBtnStyle();
+
+        
     }
 
     private void updateButtonVisibility() {

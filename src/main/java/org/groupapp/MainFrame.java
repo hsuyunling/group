@@ -62,12 +62,13 @@ private JPanel createLoginPanel() {
 
     container.add(p0);
     container.add(p1);
+    container.add(Box.createVerticalStrut(10));
     container.add(p2);
     container.add(p3);
     panel.add(container);
 
     panel.setBorder(BorderFactory.createEmptyBorder(60, 100, 60, 100));
-    container.setBorder(BorderFactory.createEmptyBorder(30, 100, 60, 100));
+    container.setBorder(BorderFactory.createEmptyBorder(20, 100, 30, 100));
     // p0.setBorder(BorderFactory.createEmptyBorder(30, 100, 0, 100));
     // p1.setBorder(BorderFactory.createEmptyBorder(0, 100, 0, 100));
     // p2.setBorder(BorderFactory.createEmptyBorder(0, 100, 0, 100));
@@ -91,7 +92,6 @@ private JPanel createLoginPanel() {
     idField.setFont(new Font("Arial", Font.PLAIN, 16));
     idLabel.setFont(new Font("Arial", Font.PLAIN, 16));
     p1.add(idLabel);
-    // panel.add(Box.createVerticalStrut(5));
     p1.add(idField);
 
 
