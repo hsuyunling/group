@@ -34,11 +34,10 @@ public class BasicInformation extends JPanel {
     // --------settings----------
     private JTextField dueDate, dueTime, paymentAccount, contactType, contactID;
     private JButton addContactBtn, deleteContactBtn;
-    private JLabel dueLabel, payLabel, contactLabel;
-    private JCheckBox cash, card;
+    private JLabel dueLabel;
     private int contactCount = 0;
 
-    List<JLabel> labels = Arrays.asList(timeLabel, placeLabel, priceLabel, limitLabel, dueLabel, payLabel, contactLabel);
+    List<JLabel> labels = Arrays.asList(timeLabel, placeLabel, priceLabel, limitLabel, dueLabel);
     List<JPanel> panels = new ArrayList<>();
 
     // --------colors----------
@@ -59,6 +58,9 @@ public class BasicInformation extends JPanel {
             label.setFont(f);
             label.setMaximumSize(new Dimension(400, 20));
         }
+        actName.setFont(f);
+        online.setFont(f);
+        free.setFont(f);
         
 
     }
@@ -79,19 +81,23 @@ public class BasicInformation extends JPanel {
 
     public void setLayout(){
         add(p0);
-        for (int i = 0; i <= 6; i++) {
+        int size = labels.size();
+
+
+        for (int i = 0; i <= size-1; i++) {
+            
             JLabel label = labels.get(i);
-            JPanel panel = panels.get(i+1);
+            JPanel panel = panels.get(i);
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
             panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
             panel.setAlignmentX(Component.LEFT_ALIGNMENT);
             add(Box.createHorizontalStrut(20));
             add(label);
-            add(Box.createVerticalStrut(10));
             add(Box.createHorizontalStrut(20));
             add(panel);
             add(Box.createVerticalStrut(10));
         }
+        add(Box.createVerticalStrut(100));
     }
 
     public void createBasicInformationPanel() {
@@ -133,12 +139,6 @@ public class BasicInformation extends JPanel {
         dueDate = new JTextField("YYYY-MM-DD", 10);
         dueTime = new JTextField("HH:MM", 5);
 
-        payLabel = new JLabel("付款方式： ");
-        cash = new JCheckBox("cash");
-        card = new JCheckBox("card");
-        paymentAccount = new JTextField("轉帳帳號", 14);
-
-        contactLabel = new JLabel("聯絡方式： ");
         addContactBtn = new JButton("+");
         deleteContactBtn = new JButton("-");
         deleteContactBtn.setVisible(false);
@@ -165,7 +165,7 @@ public class BasicInformation extends JPanel {
                 deleteContactBtn.setVisible(false);
             }
         });
-        labels = Arrays.asList(timeLabel, placeLabel, priceLabel, limitLabel, dueLabel, payLabel, contactLabel);
+        labels = Arrays.asList(timeLabel, placeLabel, priceLabel, limitLabel, dueLabel);
 
     }
 
@@ -195,9 +195,8 @@ public class BasicInformation extends JPanel {
         p3 = new JPanel();
         p4 = new JPanel();
         ps1 = new JPanel();
-        ps2 = new JPanel();
         JPanel blank = new JPanel();
-        panels = Arrays.asList(p0, p1, p2, p3, p4, ps1, ps2, blank);
+        panels = Arrays.asList(p1, p2, p3, p4, ps1);
 
         // basic information layout
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -221,37 +220,12 @@ public class BasicInformation extends JPanel {
         ps1.add(dueDate);
         ps1.add(dueTime);
 
-        ps2.add(cash);
-        ps2.add(card);
 
 
         // add(Box.createVerticalGlue());
 
 // ---------------settings-------------------
 
-
-        // 一開始不顯示
-        paymentAccount.setVisible(false);
-
-        // 用 ItemListener 監聽 checkbox 的勾選狀態
-        card.addItemListener(e -> {
-            if (card.isSelected()) {
-                paymentAccount.setVisible(true);
-                ps2.revalidate();
-                ps2.repaint();
-            } else {
-                paymentAccount.setVisible(false);
-                ps2.revalidate();
-                ps2.repaint();
-            }
-        });
-
-        JPanel ps3 = new JPanel();
-        ps3.setLayout(new FlowLayout(FlowLayout.LEFT));
-        ps3.add(contactLabel);
-        ps3.add(addContactBtn);
-
-        // add(ps3);
 
         setLabelFont();
         setTfStyle();
