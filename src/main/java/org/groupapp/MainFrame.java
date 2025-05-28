@@ -33,18 +33,23 @@ public class MainFrame extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // 加入登入頁面
+        // 加入 登入/註冊 頁面
         JPanel loginPanel = createLoginPanel();
+        JPanel registerPanel = new Register();
         mainPanel.add(loginPanel, "login");
+        mainPanel.add(registerPanel, "register");
 
         // 加入主頁面（但尚未顯示）
-        homePage = new HomePage();
-        mainPanel.add(homePage, "home");
+        /*
+         * homePage = new HomePage(user);
+         * mainPanel.add(homePage, "home");
+         */
 
         add(mainPanel);
         cardLayout.show(mainPanel, "login"); // 預設顯示登入頁
     }
 
+    // 登入頁面，含註冊按鈕
     private JPanel createLoginPanel() {
         JPanel panel = new JPanel();
         JPanel container = new RoundedPanel(40);
@@ -115,19 +120,33 @@ public class MainFrame extends JFrame {
 
         p3.add(loginBtn);
 
-        // 邏輯處理
+        // 註冊按鈕
+        JButton registerBtn = new JButton("註冊");
+        p3.add(registerBtn);
+
+        // 邏輯處理(登入)
         loginBtn.addActionListener(e -> {
+            DBUtil c = new DBUtil();
             String id = idField.getText().trim();
             String pwd = new String(pwdField.getPassword()).trim();
+            User user = c.select(id, pwd);
+            String result;
+            if (c.getSuccess()) {
+                result = "登入成功！";
+                JOptionPane.showMessageDialog(null, result, "結果", JOptionPane.PLAIN_MESSAGE);
 
-            if (DBUtil.validateUser(id, pwd)) {
-                Preferences prefs = Preferences.userRoot().node("org.groupapp");
-                prefs.put("userId", id);
-                JOptionPane.showMessageDialog(this, "登入成功！");
-                cardLayout.show(mainPanel, "home");
+                homePage = new HomePage(user); // 傳入 user
+                mainPanel.add(homePage, "home"); // 加進 CardLayout
+                cardLayout.show(mainPanel, "home"); // 切換畫面
             } else {
-                JOptionPane.showMessageDialog(this, "學號或密碼錯誤");
+                result = "帳號或密碼錯誤！";
+                JOptionPane.showMessageDialog(null, result, "結果", JOptionPane.PLAIN_MESSAGE);
             }
+        });
+
+        // 邏輯處理(註冊)
+        registerBtn.addActionListener(e -> {
+            cardLayout.show(mainPanel, "register"); // 切換畫面
         });
 
         return panel;

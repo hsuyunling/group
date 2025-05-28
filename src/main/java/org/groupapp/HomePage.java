@@ -37,11 +37,13 @@ public class HomePage extends JPanel {
     Font font = new Font("Arial", Font.PLAIN, 20);
     ArrayList<JButton> btns = new ArrayList<>();
     ArrayList<JButton> topbtns = new ArrayList<>();
+    User user = new User();
 
     // 圖片
     Image imageHome, imageFollowing, imageAddNew, imageInfo;
 
-    public HomePage() {
+    public HomePage(User user) {
+        this.user = user;
         setLayout(new BorderLayout());
 
         imageHome = new ImageIcon(getClass().getResource("/images/home.png"))
@@ -62,7 +64,6 @@ public class HomePage extends JPanel {
         setBtnActionListener(following, "following");
         setBtnActionListener(addActivity, "addNew");
         setBtnActionListener(personalInfo, "my");
-
     }
 
     // ---------------切換主頁面-------------------
@@ -123,17 +124,15 @@ public class HomePage extends JPanel {
         addNew = new EditPanel();
         followingPanel = new FollowingPanel();
 
-        personalPanel = new JPanel();
+        personalPanel = new PersonalPanel(user);
 
         centerPanel.add(homePanel, "home");
         centerPanel.add(addNew, "addNew"); // 連接EditPanel
         centerPanel.add(followingPanel, "following");
         centerPanel.add(personalPanel, "my");
-        //centerPanel.add(new KeepPanel(), "keep");
 
         homePanel.add(actListPanel, BorderLayout.CENTER);
         add(centerPanel);
-
     }
 
     // ---------------底下的四個按鈕-------------------
