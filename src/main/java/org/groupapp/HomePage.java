@@ -34,7 +34,7 @@ public class HomePage extends JPanel {
     private JButton home, following, addActivity, personalInfo, searchBtn;
     JPanel actListPanel, followingPanel, addNew, personalPanel;
     JTextField searchBar;
-    Font font = new Font("Arial", Font.PLAIN, 20);
+    Font font = new Font("Arial", Font.PLAIN, 18);
     ArrayList<JButton> btns = new ArrayList<>();
     ArrayList<JButton> topbtns = new ArrayList<>();
 
@@ -48,11 +48,11 @@ public class HomePage extends JPanel {
 
         imageHome = new ImageIcon(getClass().getResource("/images/home.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageFollowing = new ImageIcon(getClass().getResource("/images/activity.png"))
+        imageFollowing = new ImageIcon(getClass().getResource("/images/following.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         imageAddNew = new ImageIcon(getClass().getResource("/images/add.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageInfo = new ImageIcon(getClass().getResource("/images/personalInfo.png"))
+        imageInfo = new ImageIcon(getClass().getResource("/images/person.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
 
         createCenterPanel();
@@ -176,16 +176,17 @@ public class HomePage extends JPanel {
     }
 
 // ---------------中間的活動-------------------
-    private JPanel createActCard(Activity act, boolean isFavorited) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setPreferredSize(new Dimension(600, 100));
-        panel.setMaximumSize(new Dimension(600, 100));
-        panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        panel.setBackground(new Color(250, 250, 250));
+    private RoundedPanel createActCard(Activity act, boolean isFavorited) {
+        RoundedPanel panel = new RoundedPanel(15);
+        panel.setLayout(new BorderLayout());
+        panel.setPreferredSize(new Dimension(600, 200));
+        panel.setMaximumSize(new Dimension(600, 200));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 0));
+        panel.setBackground(new Color(246, 220, 135));
 
         String title = String.format(
-                "<html><b>%s%s</b><br>時間：%s %s<br>地點：%s</html>",
-                isFavorited ? "★ " : "",
+                "<html><div><b>%s%s</b><br><br>時間：%s %s<br>地點：%s<div></html>",
+                isFavorited ? "★ " : "  ",
                 act.getName(), act.getDate(), act.getTime(), act.getPlace());
 
         JLabel label = new JLabel(title);
