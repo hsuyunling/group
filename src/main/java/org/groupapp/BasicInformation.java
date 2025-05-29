@@ -49,43 +49,40 @@ public class BasicInformation extends JPanel {
         createBasicInformationPanel();
         createLayout();
         setLayout();
-        
+
     }
 
-    public void setLabelFont(){
-        Font f = new Font("Arial", Font.PLAIN, 16);
-        for(JLabel label: labels){
+    public void setLabelFont() {
+        Font f = new Font("Microsoft JhengHei", Font.PLAIN, 16); // ✅ 支援中文
+        for (JLabel label : labels) {
             label.setFont(f);
             label.setMaximumSize(new Dimension(400, 20));
         }
         actName.setFont(f);
         online.setFont(f);
         free.setFont(f);
-        
-
     }
 
-    public void setTfStyle(){
+    public void setTfStyle() {
         List<JTextField> tfs = Arrays.asList(actName, date, time, place, price, limitNumofPeople, dueDate, dueTime);
-        for(JTextField tf: tfs){
+        for (JTextField tf : tfs) {
             tf.setMaximumSize(new Dimension(150, 30));
-            tf.setPreferredSize(new Dimension(150,30));
+            tf.setPreferredSize(new Dimension(150, 30));
         }
         time.setMaximumSize(new Dimension(80, 30));
-        time.setPreferredSize(new Dimension(80,30));
+        time.setPreferredSize(new Dimension(80, 30));
         dueTime.setMaximumSize(new Dimension(80, 30));
-        dueTime.setPreferredSize(new Dimension(80,30));
+        dueTime.setPreferredSize(new Dimension(80, 30));
         actName.setMaximumSize(new Dimension(300, 50));
-        actName.setPreferredSize(new Dimension(300,50));
+        actName.setPreferredSize(new Dimension(300, 50));
     }
 
-    public void setLayout(){
+    public void setLayout() {
         add(p0);
         int size = labels.size();
 
+        for (int i = 0; i <= size - 1; i++) {
 
-        for (int i = 0; i <= size-1; i++) {
-            
             JLabel label = labels.get(i);
             JPanel panel = panels.get(i);
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -132,7 +129,6 @@ public class BasicInformation extends JPanel {
 
         limitLabel = new JLabel("人數限制: ");
         limitNumofPeople = new JTextField(10);
-
 
         // --------settings----------
         dueLabel = new JLabel("截止日期： ");
@@ -220,12 +216,9 @@ public class BasicInformation extends JPanel {
         ps1.add(dueDate);
         ps1.add(dueTime);
 
-
-
         // add(Box.createVerticalGlue());
 
-// ---------------settings-------------------
-
+        // ---------------settings-------------------
 
         setLabelFont();
         setTfStyle();
@@ -233,25 +226,25 @@ public class BasicInformation extends JPanel {
     }
 
     // public void setBtnStyle(){
-        
-    //         for (JTextField tf : tf) {
-    //         final JTextField thisBtn = btn;
-    //         thisBtn.setOpaque(true);
-    //         thisBtn.setBorderPainted(false);
-    //         thisBtn.setContentAreaFilled(true);
-    //         thisBtn.setFocusPainted(false);
 
-    //         thisBtn.setBackground(normalColor);
+    // for (JTextField tf : tf) {
+    // final JTextField thisBtn = btn;
+    // thisBtn.setOpaque(true);
+    // thisBtn.setBorderPainted(false);
+    // thisBtn.setContentAreaFilled(true);
+    // thisBtn.setFocusPainted(false);
 
-    //         thisBtn.getModel().addChangeListener(e -> {
-    //             ButtonModel model = thisBtn.getModel();
-    //             if (model.isPressed()) {
-    //                 thisBtn.setBackground(pressedColor);
-    //             } else {
-    //                 thisBtn.setBackground(normalColor);
-    //             }
-    //         });
-    //     }
+    // thisBtn.setBackground(normalColor);
+
+    // thisBtn.getModel().addChangeListener(e -> {
+    // ButtonModel model = thisBtn.getModel();
+    // if (model.isPressed()) {
+    // thisBtn.setBackground(pressedColor);
+    // } else {
+    // thisBtn.setBackground(normalColor);
+    // }
+    // });
+    // }
     // }
 
     // 加在 class 裡最後面
