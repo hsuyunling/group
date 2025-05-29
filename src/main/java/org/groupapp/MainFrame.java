@@ -62,12 +62,17 @@ public class MainFrame extends JFrame {
 
         container.add(p0);
         container.add(p1);
+        container.add(Box.createVerticalStrut(10));
         container.add(p2);
         container.add(p3);
         panel.add(container);
 
         panel.setBorder(BorderFactory.createEmptyBorder(60, 100, 60, 100));
-        container.setBorder(BorderFactory.createEmptyBorder(30, 100, 60, 100));
+        container.setBorder(BorderFactory.createEmptyBorder(20, 100, 30, 100));
+        // p0.setBorder(BorderFactory.createEmptyBorder(30, 100, 0, 100));
+        // p1.setBorder(BorderFactory.createEmptyBorder(0, 100, 0, 100));
+        // p2.setBorder(BorderFactory.createEmptyBorder(0, 100, 0, 100));
+        // p3.setBorder(BorderFactory.createEmptyBorder(0, 100, 60, 100));
 
         panel.setBackground(new Color(246, 209, 86));
 
@@ -79,12 +84,13 @@ public class MainFrame extends JFrame {
         p0.add(Box.createVerticalStrut(15)); // 空間
         p0.add(title);
 
+        
         // 學號欄位
         JTextField idField = new JTextField();
         JLabel idLabel = new JLabel("學號：");
         idField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        idField.setFont(new Font(null, Font.PLAIN, 16));
-        idLabel.setFont(new Font(null, Font.PLAIN, 16));
+        idField.setFont(new Font("Arial", Font.PLAIN, 16));
+        idLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         p1.add(idLabel);
         p1.add(idField);
 
@@ -92,8 +98,8 @@ public class MainFrame extends JFrame {
         JPasswordField pwdField = new JPasswordField();
         JLabel pwdLabel = new JLabel("密碼：");
         pwdField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        pwdLabel.setFont(new Font(null, Font.PLAIN, 16));
-        pwdField.setFont(new Font(null, Font.PLAIN, 16));
+        pwdLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        pwdField.setFont(new Font("Arial", Font.PLAIN, 16));
         p2.add(pwdLabel);
         p2.add(pwdField);
 

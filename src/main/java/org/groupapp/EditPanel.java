@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonModel;
@@ -97,6 +98,8 @@ public class EditPanel extends JPanel {
         back.setVisible(false);
         southPanel.add(next);
         southPanel.add(confirm);
+        southPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
         confirm.setVisible(false);
         add(southPanel, BorderLayout.SOUTH);
 
@@ -117,6 +120,10 @@ public class EditPanel extends JPanel {
                 updateButtonVisibility();
             }
         });
+
+        setBtnStyle();
+
+        
     }
 
     private void updateButtonVisibility() {
