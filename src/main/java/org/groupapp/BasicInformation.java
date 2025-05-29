@@ -53,7 +53,7 @@ public class BasicInformation extends JPanel {
     }
 
     public void setLabelFont() {
-        Font f = new Font("Microsoft JhengHei", Font.PLAIN, 16); // ✅ 支援中文
+        Font f = new Font("Microsoft JhengHei", Font.PLAIN, 16); //  支援中文
         for (JLabel label : labels) {
             label.setFont(f);
             label.setMaximumSize(new Dimension(400, 20));
