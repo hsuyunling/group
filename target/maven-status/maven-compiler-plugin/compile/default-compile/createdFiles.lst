@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 org/groupapp/EditPanel.class
 org/groupapp/RoundedPanel.class
 org/groupapp/Activity.class
@@ -9,3 +10,5 @@ org/groupapp/KeepPage.class
 org/groupapp/BasicInformation.class
 org/groupapp/BasicInformation$1.class
 org/groupapp/Join.class
+=======
+>>>>>>> main

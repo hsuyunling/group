@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.prefs.Preferences;
 
 public class DBUtil {
     private static final String SERVER = "jdbc:mysql://140.119.19.73:3315/";
@@ -229,6 +230,38 @@ public class DBUtil {
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean addActivity(Activity act) {
+        String sql = "INSERT INTO activity (name, date, time, place, intro, due_date, due_time, host_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // 從 Preferences 取得目前登入者（主辦人）ID
+            Preferences prefs = Preferences.userRoot().node("org.groupapp");
+            String hostId = prefs.get("userId", null);
+
+            if (hostId == null) {
+                System.out.println("⚠️ 尚未登入，無法新增活動");
+                return false;
+            }
+
+            // 設定參數
+            stmt.setString(1, act.getName());
+            stmt.setString(2, act.getDate());
+            stmt.setString(3, act.getTime());
+            stmt.setString(4, act.getPlace());
+            stmt.setString(5, act.getIntro());
+            stmt.setString(6, act.getDueDate());
+            stmt.setString(7, act.getDueTime());
+            stmt.setString(8, hostId);
+
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
