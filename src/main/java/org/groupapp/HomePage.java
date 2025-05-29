@@ -44,13 +44,13 @@ public class HomePage extends JPanel {
     public HomePage() {
         setLayout(new BorderLayout());
 
-        imageHome = new ImageIcon(getClass().getResource("/images/home.png"))
+        imageHome = new ImageIcon(getClass().getResource("/home.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageFollowing = new ImageIcon(getClass().getResource("/images/following.png"))
+        imageFollowing = new ImageIcon(getClass().getResource("/following.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageAddNew = new ImageIcon(getClass().getResource("/images/add.png"))
+        imageAddNew = new ImageIcon(getClass().getResource("/add.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageInfo = new ImageIcon(getClass().getResource("/images/person.png"))
+        imageInfo = new ImageIcon(getClass().getResource("/person.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
 
         createCenterPanel();
