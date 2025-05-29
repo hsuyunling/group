@@ -77,7 +77,7 @@ public class MainFrame extends JFrame {
         // 標題
         JLabel title = new JLabel("登入 Group");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        title.setFont(new Font("Microsoft JhengHei", Font.BOLD, 22)); // ✅ 支援中文字型
+        title.setFont(new Font("Microsoft JhengHei", Font.BOLD, 22)); //  支援中文字型
         title.setBorder(BorderFactory.createEmptyBorder(15, 0, 30, 0));
         p0.add(title);
 
@@ -85,8 +85,8 @@ public class MainFrame extends JFrame {
         JTextField idField = new JTextField();
         JLabel idLabel = new JLabel("學號：");
         idField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        idField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // ✅
-        idLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // ✅
+        idField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
+        idLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
         p1.add(idLabel);
         p1.add(idField);
 
