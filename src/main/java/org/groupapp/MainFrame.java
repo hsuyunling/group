@@ -3,15 +3,12 @@ package org.groupapp;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,11 +16,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 public class MainFrame extends JFrame {
     private CardLayout cardLayout;
-    private JPanel mainPanel, p1, p2, p3;
+    private JPanel mainPanel ,p0 , p1, p2, p3;
     private HomePage homePage;
+    Color color = UIManager.getColor ( "Panel.background" );
 
     public MainFrame() {
         setTitle("Group");
@@ -54,7 +53,7 @@ public class MainFrame extends JFrame {
     private JPanel createLoginPanel() {
         JPanel panel = new JPanel();
         JPanel container = new RoundedPanel(40);
-        JPanel p0 = new JPanel();
+        p0 = new JPanel();
         p1 = new JPanel();
         p2 = new JPanel();
         p3 = new JPanel();
@@ -64,12 +63,13 @@ public class MainFrame extends JFrame {
         p0.setLayout(new BoxLayout(p0, BoxLayout.Y_AXIS));
         p1.setLayout(new BoxLayout(p1, BoxLayout.X_AXIS));
         p2.setLayout(new BoxLayout(p2, BoxLayout.X_AXIS));
-        p3.setLayout(new BoxLayout(p3, BoxLayout.Y_AXIS));
+        p3.setLayout(new BoxLayout(p3, BoxLayout.X_AXIS));
 
         container.add(p0);
         container.add(p1);
         container.add(Box.createVerticalStrut(10));
         container.add(p2);
+        container.add(Box.createVerticalStrut(10));
         container.add(p3);
         panel.add(container);
 
@@ -99,31 +99,36 @@ public class MainFrame extends JFrame {
         JPasswordField pwdField = new JPasswordField();
         JLabel pwdLabel = new JLabel("密碼：");
         pwdField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        pwdLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // ✅
-        pwdField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // ✅
+        pwdLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
+        pwdField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
         p2.add(pwdLabel);
         p2.add(pwdField);
 
-        p3.add(Box.createVerticalStrut(25)); // 空間
 
         // 登入按鈕
         JButton loginBtn = new JButton("登入");
         loginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        loginBtn.setPreferredSize(new Dimension(120, 40));
         loginBtn.setMaximumSize(new Dimension(100, 40));
-        loginBtn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 16)); // ✅
+        loginBtn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 16)); // 
         loginBtn.setBackground(new Color(246, 209, 86));
         loginBtn.setForeground(Color.black);
         loginBtn.setFocusPainted(false);
-        loginBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginBtn.setOpaque(true);
         loginBtn.setBorderPainted(false);
         loginBtn.setContentAreaFilled(true);
-        p3.add(loginBtn);
 
-        // 註冊按鈕
         JButton registerBtn = new JButton("註冊");
+        registerBtn.setFocusPainted(false);
+        registerBtn.setOpaque(true);
+        registerBtn.setBackground(color);
+        registerBtn.setBorderPainted(false);
+        registerBtn.setPreferredSize(new Dimension(60, 40));
+
+        p3.add(Box.createRigidArea(new Dimension(70, 0))); // 開頭空格
+        p3.add(loginBtn);
+        // p3.add(Box.createRigidArea(new Dimension(5, 0)));  // login 和 register 之間空格
         p3.add(registerBtn);
+
 
         // 邏輯處理(登入)
         loginBtn.addActionListener(e -> {
