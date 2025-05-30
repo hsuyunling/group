@@ -1,0 +1,25 @@
+# ===== Java Build Output =====
+/target/
+*.class
+
+# ===== IDE / Editor =====
+/.vscode/
+/.idea/
+*.iml
+
+# ===== System Files =====
+.DS_Store
+Thumbs.db
+
+# ===== Logs =====
+*.log
+
+# ===== Temporary Files =====
+*.tmp
+*.swp
+*.bak
+*.~*
+
+# ===== Ignore generated files =====
+/bin/
+/out/
