@@ -87,8 +87,8 @@ public class FollowingPanel extends JPanel {
             favoritePanel.add(new JLabel("你尚未收藏任何活動"));
         }
 
-        tabbedPane.add("已報名", new JScrollPane(joinedPanel));
-        tabbedPane.add("已收藏", new JScrollPane(favoritePanel));
+        tabbedPane.add("    已報名    ", new JScrollPane(joinedPanel));
+        tabbedPane.add("    已收藏    ", new JScrollPane(favoritePanel));
     }
 
     private JPanel createActCard(Activity act, boolean showCancelBtn, String userId, Runnable onChange) {
