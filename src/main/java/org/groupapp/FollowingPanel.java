@@ -39,9 +39,8 @@ public class FollowingPanel extends JPanel {
         add(tabbedPane, BorderLayout.CENTER);
         tabbedPane.setFont(new Font("Arial", Font.BOLD, 18)); // 改字型
 
-        UIManager.put("TabbedPane.selected", normalColor);          // 選取中的 tab 背景
         UIManager.put("TabbedPane.contentAreaColor", Color.white);   // 內容區背景
-        UIManager.put("TabbedPane.background", pressedColor);   // 一般 tab 背景
+        UIManager.put("TabbedPane.background", normalColor);   // 一般 tab 背景
         tabbedPane.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));// 上、左、下、右各留 10 像素空間
 
         
