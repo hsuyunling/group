@@ -10,6 +10,8 @@ public class PersonalPanel extends JPanel {
     private JPanel panel, namePanel, emailPanel, phonePanel, IDPanel, genderPanel, radioPanel, imagePanel;
     private JLabel labelName, labelEmail, labelPhone, labelID, labelGender, imageLabel;
     private JRadioButton femaleButton, maleButton, nonButton;
+    private JButton editBtn;
+    private Image defaltImg, hippoImg, boyImg, girlImg, penguinImg;
 
     User user;
     DBUtil db = new DBUtil();
@@ -18,12 +20,13 @@ public class PersonalPanel extends JPanel {
     // Consturctor
     public PersonalPanel(User user) {
         this.user = user;
+        setLayout(new GridLayout(2, 1));
+        image();
         createPanel();
     }
 
+    // 個人資訊文字的地方
     public void createPanel() {
-        image();
-
         panel = new JPanel();
         panel.setLayout(new GridLayout(5, 1));
         namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -57,10 +60,12 @@ public class PersonalPanel extends JPanel {
         add(panel, BorderLayout.CENTER);
     }
 
+    // 性別選擇按鈕
     private void createGenderButton() {
+
         maleButton = new JRadioButton("男");
         femaleButton = new JRadioButton("女");
-        nonButton = new JRadioButton("不透漏");
+        nonButton = new JRadioButton("不透露");
 
         ButtonGroup g = new ButtonGroup();
         radioPanel = new JPanel();
@@ -74,49 +79,71 @@ public class PersonalPanel extends JPanel {
 
         JButton confirm = new JButton("確認");
         confirm.addActionListener(e -> {
+            String selectGender = null;
             if (maleButton.isSelected()) {
-                db.execute("男");
+                selectGender = "男";
             } else if (femaleButton.isSelected()) {
-                db.execute("女");
+                selectGender = "女";
             } else if (nonButton.isSelected()) {
-                db.execute("不透漏");
+                selectGender = "不透露";
             }
+
+            if (selectGender != null) {
+                if (db.execute(selectGender, user.getName())) { // 確認資料庫執行成功
+                    user.setGender(selectGender);
+                    removeAll();
+                    revalidate();
+                    repaint();
+                    image();
+                    createPanel();
+                }
+
+            }
+
         });
 
         genderPanel.add(radioPanel);
+        genderPanel.add(confirm);
     }
 
     // 照片
     public void image() {
+        defaltImg = new ImageIcon(getClass().getResource("/penguin.png"))
+                .getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        hippoImg = new ImageIcon(getClass().getResource("/hippo.png"))
+                .getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        boyImg = new ImageIcon(getClass().getResource("/boy.png"))
+                .getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        girlImg = new ImageIcon(getClass().getResource("/girl.png"))
+                .getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        penguinImg = new ImageIcon(getClass().getResource("/penguin.png"))
+                .getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+
+        Icon defaultIcon = new ImageIcon(defaltImg);
+        Icon hippoIcon = new ImageIcon(hippoImg);
+        Icon boyIcon = new ImageIcon(boyImg);
+        Icon girlIcon = new ImageIcon(girlImg);
+        Icon penguinIcon = new ImageIcon(penguinImg);
+
+        imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+
         if (user.getGender() == null) {
-            imageURL = "https://thumb.ac-illust.com/83/83424bf45d0570a09649ac394b40e118_w.jpeg";
+            imageLabel.setIcon(defaultIcon);
         } else if (user.getGender().equals("男")) {
-            imageURL = "https://drive.google.com/uc?export=view&id=1INQQcd4E1C3foBaHji2EPNvZZTsliIAP";
+            imageLabel.setIcon(boyIcon);
         } else if (user.getGender().equals("女")) {
-            imageURL = "https://drive.google.com/uc?export=view&id=1kLjMKDJvSdkwUaI59Ccy_6TYaOjdR2CM";
+            imageLabel.setIcon(girlIcon);
         } else if (user.getGender().equals("不透漏")) {
-            imageURL = "https://images.icon-icons.com/3037/PNG/512/agender_gender_genderless_no_gender_genderqueer_icon_189179.png";
-        } else
-            imageURL = "https://media.istockphoto.com/id/584764738/zh/%E5%90%91%E9%87%8F/realistic-full-moon.jpg?s=1024x1024&w=is&k=20&c=G0ftKdRiSC11e6xWBtEV6idQeaIOE_r7hBi14fIuCJA=";
+            imageLabel.setIcon(hippoIcon);
+        } else {
+            imageLabel.setIcon(penguinIcon);
 
-        try {
-
-            URI uri = new URI(imageURL);
-            URL url = uri.toURL();
-            ImageIcon imageIcon = new ImageIcon(url);
-
-            // 200x200
-            Image image = imageIcon.getImage();
-            Image newimg = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-            imageIcon = new ImageIcon(newimg);
-
-            imageLabel = new JLabel(imageIcon);
-            imagePanel = new JPanel(new BorderLayout());
-            imagePanel.add(imageLabel, BorderLayout.CENTER);
-            add(imagePanel, BorderLayout.NORTH);
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+        imagePanel = new JPanel(new BorderLayout());
+        imagePanel.add(imageLabel, BorderLayout.CENTER);
+        add(imagePanel, BorderLayout.NORTH);
     }
+
 }

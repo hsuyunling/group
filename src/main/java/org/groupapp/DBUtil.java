@@ -247,19 +247,21 @@ public class DBUtil {
     }
 
     // 輸入非必要資料，性別
-    public void execute(String gender) {
+    public boolean execute(String gender, String name) {
         // try-with 確保關掉
         try (Connection conn = getConnection()) {
             System.out.println("DB Connected");
-            String query = "INSERT INTO `user`(gender) VALUES(?)";
+            String query = "UPDATE `user` SET gender = ? WHERE name = ?;";
             try (PreparedStatement pstmt = conn.prepareStatement(query)) {
                 pstmt.setString(1, gender);
+                pstmt.setString(2, name);
                 pstmt.executeUpdate();
-
                 JOptionPane.showMessageDialog(null, "儲存成功！", "嘻嘻", JOptionPane.PLAIN_MESSAGE);
+                return true;
             }
         } catch (SQLException e) {
             System.out.println("資料庫錯誤：" + e.getMessage());
+            return false;
         }
     }
 
