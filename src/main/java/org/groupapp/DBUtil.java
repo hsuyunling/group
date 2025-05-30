@@ -9,7 +9,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.JOptionPane;
+
 import java.util.prefs.Preferences;
+
 
 public class DBUtil {
     private static final String SERVER = "jdbc:mysql://140.119.19.73:3315/";
@@ -223,18 +227,81 @@ public class DBUtil {
         }
     }
 
-    public static boolean validateUser(String id, String password) {
-        String sql = "SELECT * FROM user WHERE id = ? AND password = ?";
-        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, id);
-            stmt.setString(2, password);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+    // 註冊時必要資料的輸入
+    public void execute(String name, String email, String phone, String number, String pass) {
+        // try-with 確保關掉
+        try (Connection conn = getConnection()) {
+            System.out.println("DB Connected");
+            String query = "INSERT INTO `user`(id, password, name, email, phone) VALUES(?, ?, ?, ?, ?)";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, number);
+                pstmt.setString(2, pass);
+                pstmt.setString(3, name);
+                pstmt.setString(4, email);
+                pstmt.setString(5, phone);
+                pstmt.executeUpdate();
+                System.out.println("成功喔！");
+            }
+        } catch (SQLException e) {
+            System.out.println("資料庫錯誤：" + e.getMessage());
         }
     }
+
+    // 輸入非必要資料，性別
+    public void execute(String gender) {
+        // try-with 確保關掉
+        try (Connection conn = getConnection()) {
+            System.out.println("DB Connected");
+            String query = "INSERT INTO `user`(gender) VALUES(?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, gender);
+                pstmt.executeUpdate();
+
+                JOptionPane.showMessageDialog(null, "儲存成功！", "嘻嘻", JOptionPane.PLAIN_MESSAGE);
+            }
+        } catch (SQLException e) {
+            System.out.println("資料庫錯誤：" + e.getMessage());
+        }
+    }
+
+
+    boolean success = false;
+
+    // 檢查登入帳密是否正確
+    public User select(String id, String pass) {
+        try (Connection conn = getConnection()) {
+            System.out.println("DB Connected");
+
+            String query = "SELECT * FROM user WHERE id=? AND password=?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, id);
+            pstmt.setString(2, pass);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    success = true;
+                    String name = rs.getString("name");
+                    String email = rs.getString("email");
+                    String phone = rs.getString("phone");
+                    String gender = rs.getString("gender");
+
+                    return new User(id, name, email, phone, gender);
+
+                } else {
+                    success = false;
+                    return null;
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("資料庫錯誤：" + e.getMessage());
+        }
+        return null;
+    }
+
+    public boolean getSuccess() {
+        return success;
 
     public static boolean addActivity(Activity act) {
         String sql = "INSERT INTO activity (name, date, time, place, intro, due_date, due_time, host_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -266,6 +333,7 @@ public class DBUtil {
             e.printStackTrace();
             return false;
         }
+
     }
 
 }
