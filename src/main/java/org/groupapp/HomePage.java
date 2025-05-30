@@ -37,11 +37,13 @@ public class HomePage extends JPanel {
     JTextField searchBar;
     Font font = new Font("Arial", Font.PLAIN, 18);
     ArrayList<JButton> btns = new ArrayList<>();
-    ArrayList<JButton> topbtns = new ArrayList<>();
     User user = new User();
 
+    Color normalColor = new Color(246, 209, 86);
+    Color pressedColor = new Color(195, 170, 87);
+
     // 圖片
-    Image imageHome, imageFollowing, imageAddNew, imageInfo;
+    Image imageHome, imageFollowing, imageAddNew, imageInfo, imageSearch;
 
     public HomePage(User user) {
         this.user = user;
@@ -54,6 +56,8 @@ public class HomePage extends JPanel {
         imageAddNew = new ImageIcon(getClass().getResource("/add.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         imageInfo = new ImageIcon(getClass().getResource("/person.png"))
+                .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        imageSearch = new ImageIcon(getClass().getResource("/search.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
 
         createCenterPanel();
@@ -81,28 +85,24 @@ public class HomePage extends JPanel {
 
     // ---------------主頁面-------------------
     public void createCenterPanel() {
-        northPanel = new JPanel();
+        northPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JPanel homePanel = new JPanel();
         homePanel.setLayout(new BorderLayout());
         homePanel.add(northPanel, BorderLayout.NORTH);
 
-        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton btnAll = new JButton("全部");
-        JButton btnAct = new JButton("活動");
-        JButton btnGroup = new JButton("揪團");
-        // panel
-        filterPanel.add(btnAll);
-        filterPanel.add(btnAct);
-        filterPanel.add(btnGroup);
-        // arrayList
-        topbtns.add(btnAll);
-        topbtns.add(btnAct);
-        topbtns.add(btnGroup);
+        JTextField questionField = new JTextField();
+        // questionField.setPreferredSize(new Dimension());
 
-        filterPanel.setBackground(Color.WHITE);
-        northPanel.setBackground(Color.WHITE);
+        JButton search = new JButton();
+        Icon searchIcon = new ImageIcon(imageSearch);
+        search.setIcon(searchIcon);
 
-        northPanel.add(filterPanel);
+        northPanel.add(questionField);
+        northPanel.add(search);
+
+
+        northPanel.setBackground(normalColor);
+
         centerPanel = new JPanel();
         centerPanel.setLayout(cardLayout);
 
@@ -212,8 +212,7 @@ public class HomePage extends JPanel {
 
     // ---------------按鈕形式-------------------
     public void setBtnStyle() {
-        Color normalColor = new Color(246, 209, 86);
-        Color pressedColor = new Color(195, 170, 87);
+
         Font f = new Font("Calibri", Font.PLAIN, 18);
 
         // ---------------底下四個按鈕-------------------
@@ -237,25 +236,6 @@ public class HomePage extends JPanel {
             southPanel.add(thisBtn);
         }
 
-        // ---------------主頁面上面三個按鈕-------------------
-        for (JButton btn : topbtns) {
-            final JButton thisBtn = btn;
-            thisBtn.setOpaque(true);
-            thisBtn.setBorderPainted(false);
-            thisBtn.setContentAreaFilled(true);
-            thisBtn.setFocusPainted(false);
-
-            thisBtn.setBackground(normalColor);
-
-            thisBtn.getModel().addChangeListener(e -> {
-                ButtonModel model = thisBtn.getModel();
-                if (model.isPressed()) {
-                    thisBtn.setBackground(pressedColor);
-                } else {
-                    thisBtn.setBackground(normalColor);
-                }
-            });
-        }
     }
 
     public void refreshActivityList() {

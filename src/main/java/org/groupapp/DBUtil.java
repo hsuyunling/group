@@ -9,10 +9,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
-
-import java.util.prefs.Preferences;
 
 
 public class DBUtil {
@@ -302,7 +301,7 @@ public class DBUtil {
 
     public boolean getSuccess() {
         return success;
-
+    }
     public static boolean addActivity(Activity act) {
         String sql = "INSERT INTO activity (name, date, time, place, intro, due_date, due_time, host_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
