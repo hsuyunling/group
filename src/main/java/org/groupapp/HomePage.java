@@ -23,6 +23,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 public class HomePage extends JPanel {
@@ -105,6 +106,7 @@ public class HomePage extends JPanel {
         centerPanel.setLayout(cardLayout);
 
         actListPanel = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(actListPanel);
         actListPanel.setLayout(new BoxLayout(actListPanel, BoxLayout.Y_AXIS));
         actListPanel.setBackground(Color.WHITE);
 
@@ -133,7 +135,7 @@ public class HomePage extends JPanel {
         centerPanel.add(personalPanel, "my");
         //centerPanel.add(new KeepPanel(), "keep");
 
-        homePanel.add(actListPanel, BorderLayout.CENTER);
+        homePanel.add(scrollPane, BorderLayout.CENTER);
         add(centerPanel);
 
     }
@@ -180,8 +182,8 @@ public class HomePage extends JPanel {
     private RoundedPanel createActCard(Activity act, boolean isFavorited) {
         RoundedPanel panel = new RoundedPanel(15);
         panel.setLayout(new BorderLayout());
-        panel.setPreferredSize(new Dimension(600, 200));
-        panel.setMaximumSize(new Dimension(600, 200));
+        panel.setPreferredSize(new Dimension(600, 120));
+        panel.setMaximumSize(new Dimension(600, 120));
         panel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 0));
         panel.setBackground(new Color(246, 220, 135));
 
