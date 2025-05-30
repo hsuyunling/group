@@ -30,9 +30,9 @@ public class ActIntro extends JPanel {
 	public void createActIntroPanel(){
         size = new Dimension(650, 600);
 		introLabel = new JLabel("活動簡介");
-        introLabel.setFont(new Font("Arial", Font.BOLD, 17));
+        introLabel.setFont(new Font("微軟正黑體", Font.BOLD, 17));
 		introArea = new JTextArea();
-        introArea.setFont(new Font("Arial", Font.PLAIN, 17));
+        introArea.setFont(new Font("微軟正黑體", Font.PLAIN, 17));
 		scrollPane = new JScrollPane(introArea); // 加捲軸
         scrollPane.setPreferredSize(size);
         scrollPane.setMaximumSize(size);
