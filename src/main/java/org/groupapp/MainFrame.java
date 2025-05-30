@@ -20,9 +20,9 @@ import javax.swing.UIManager;
 
 public class MainFrame extends JFrame {
     private CardLayout cardLayout;
-    private JPanel mainPanel ,p0 , p1, p2, p3;
+    private JPanel mainPanel, p0, p1, p2, p3;
     private HomePage homePage;
-    Color color = UIManager.getColor ( "Panel.background" );
+    Color color = UIManager.getColor("Panel.background");
 
     public MainFrame() {
         setTitle("Group");
@@ -35,7 +35,7 @@ public class MainFrame extends JFrame {
 
         // 加入 登入/註冊 頁面
         JPanel loginPanel = createLoginPanel();
-        JPanel registerPanel = new Register();
+        JPanel registerPanel = new Register(cardLayout, mainPanel);
         mainPanel.add(loginPanel, "login");
         mainPanel.add(registerPanel, "register");
 
@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
     }
 
     // 登入頁面，含註冊按鈕
-    private JPanel createLoginPanel() {
+    public JPanel createLoginPanel() {
         JPanel panel = new JPanel();
         JPanel container = new RoundedPanel(40);
         p0 = new JPanel();
@@ -78,11 +78,10 @@ public class MainFrame extends JFrame {
 
         panel.setBackground(new Color(246, 209, 86));
 
-        
         // 標題
         JLabel title = new JLabel("登入 Group");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        title.setFont(new Font("Microsoft JhengHei", Font.BOLD, 22)); //  支援中文字型
+        title.setFont(new Font("Microsoft JhengHei", Font.BOLD, 22)); // 支援中文字型
         title.setBorder(BorderFactory.createEmptyBorder(15, 0, 30, 0));
         p0.add(title);
 
@@ -90,8 +89,8 @@ public class MainFrame extends JFrame {
         JTextField idField = new JTextField();
         JLabel idLabel = new JLabel("學號：");
         idField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        idField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
-        idLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
+        idField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); //
+        idLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); //
         p1.add(idLabel);
         p1.add(idField);
 
@@ -99,17 +98,16 @@ public class MainFrame extends JFrame {
         JPasswordField pwdField = new JPasswordField();
         JLabel pwdLabel = new JLabel("密碼：");
         pwdField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        pwdLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
-        pwdField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
+        pwdLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); //
+        pwdField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); //
         p2.add(pwdLabel);
         p2.add(pwdField);
-
 
         // 登入按鈕
         JButton loginBtn = new JButton("登入");
         loginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginBtn.setMaximumSize(new Dimension(100, 40));
-        loginBtn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 16)); // 
+        loginBtn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 16)); //
         loginBtn.setBackground(new Color(246, 209, 86));
         loginBtn.setForeground(Color.black);
         loginBtn.setFocusPainted(false);
@@ -126,9 +124,8 @@ public class MainFrame extends JFrame {
 
         p3.add(Box.createRigidArea(new Dimension(70, 0))); // 開頭空格
         p3.add(loginBtn);
-        // p3.add(Box.createRigidArea(new Dimension(5, 0)));  // login 和 register 之間空格
+        // p3.add(Box.createRigidArea(new Dimension(5, 0))); // login 和 register 之間空格
         p3.add(registerBtn);
-
 
         // 邏輯處理(登入)
         loginBtn.addActionListener(e -> {

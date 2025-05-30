@@ -13,13 +13,17 @@ public class Register extends JPanel {
     private JPanel panel, namePanel, emailPanel, phonePanel, numberPanel, passWordPanel, smallPanel;
     private JLabel labelName, labelEmail, labelPhone, labelNumber, labelPassWord;
     private JTextField textName, textEmail, textPhone, textNumber, textPassWord;
-    private JButton buttonFin;
+    private JButton buttonFin, backbtn;
 
     private String name, email, phone, number, passWord;
     DBUtil u = new DBUtil();
+    private CardLayout cardLayout;
+    private JPanel mainPanel;
 
     // constructor
-    public Register() {
+    public Register(CardLayout cardLayout, JPanel mainPanel) {
+        this.cardLayout = cardLayout;
+        this.mainPanel = mainPanel;
         createPanel();
     }
 
@@ -62,10 +66,8 @@ public class Register extends JPanel {
         passWordPanel.add(labelPassWord);
         passWordPanel.add(textPassWord);
 
+        // ButtonFin 完成編輯，跳到登入頁
         buttonFin = new JButton("完成");
-        buttonFin.setPreferredSize(new Dimension(10, 50));
-
-        // createButton
         buttonFin.addActionListener(e -> {
             // 拿資料
             name = textName.getText();
@@ -76,13 +78,22 @@ public class Register extends JPanel {
             u.execute(name, email, phone, number, passWord);
 
             JOptionPane.showMessageDialog(null, "儲存成功", "嘻嘻", JOptionPane.PLAIN_MESSAGE);
-            MainFrame f = new MainFrame();
-            f.setVisible(true);
+            cardLayout.show(mainPanel, "login");
+            // MainFrame f = new MainFrame();
+            // f.setVisible(true);
         });
 
-        buttonFin.setPreferredSize(new Dimension(200, 40));
+        // backbtn 返回登入頁面
+        backbtn = new JButton("返回");
+        backbtn.addActionListener(e -> {
+            cardLayout.show(mainPanel, "login");
+        });
+
+        buttonFin.setPreferredSize(new Dimension(100, 40));
+        backbtn.setPreferredSize(new Dimension(100, 40));
         JPanel p1 = new JPanel();
         p1.add(buttonFin);
+        p1.add(backbtn);
         panel.add(p1, BorderLayout.SOUTH);
 
         // 把panel加到frame
