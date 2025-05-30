@@ -1,189 +1,30 @@
 package org.groupapp;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.toedter.calendar.JDateChooser;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
+import javax.swing.*;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class BasicInformation extends JPanel {
 
-    JPanel p0, p1, p2, p3, p4, ps1, ps2;
+    JPanel p0, p1, p2, p3, p4, ps1;
 
-    // --------basic information----------
-    private JTextField actName, date, time, place, price, limitNumofPeople;
+    private JTextField actName, place, price, limitNumofPeople;
     private JLabel timeLabel, placeLabel, priceLabel, limitLabel;
     private JRadioButton online, free;
+    private JDateChooser dateChooser, dueDateChooser;
+    private JSpinner timeSpinner, dueTimeSpinner;
 
-    // --------settings----------
-    private JTextField dueDate, dueTime, paymentAccount, contactType, contactID;
-    private JButton addContactBtn, deleteContactBtn;
-    private JLabel dueLabel;
-    private int contactCount = 0;
-
-    List<JLabel> labels = Arrays.asList(timeLabel, placeLabel, priceLabel, limitLabel, dueLabel);
-    List<JPanel> panels = new ArrayList<>();
-
-    // --------colors----------
     Color normalColor = new Color(246, 209, 86);
     Color pressedColor = new Color(195, 170, 87);
 
     public BasicInformation() {
-        // setBorder(BorderFactory.createEmptyBorder(20,20,0,20));
-        createBasicInformationPanel();
         createLayout();
-        setLayout();
-
+       
     }
 
-    public void setLabelFont() {
-        Font f = new Font("Microsoft JhengHei", Font.PLAIN, 16); //  支援中文
-        for (JLabel label : labels) {
-            label.setFont(f);
-            label.setMaximumSize(new Dimension(400, 20));
-        }
-        actName.setFont(f);
-        online.setFont(f);
-        free.setFont(f);
-    }
-
-    public void setTfStyle() {
-        List<JTextField> tfs = Arrays.asList(actName, date, time, place, price, limitNumofPeople, dueDate, dueTime);
-        for (JTextField tf : tfs) {
-            tf.setMaximumSize(new Dimension(150, 30));
-            tf.setPreferredSize(new Dimension(150, 30));
-        }
-        time.setMaximumSize(new Dimension(80, 30));
-        time.setPreferredSize(new Dimension(80, 30));
-        dueTime.setMaximumSize(new Dimension(80, 30));
-        dueTime.setPreferredSize(new Dimension(80, 30));
-        actName.setMaximumSize(new Dimension(300, 50));
-        actName.setPreferredSize(new Dimension(300, 50));
-    }
-
-    public void setLayout() {
-        add(p0);
-        int size = labels.size();
-
-        for (int i = 0; i <= size - 1; i++) {
-
-            JLabel label = labels.get(i);
-            JPanel panel = panels.get(i);
-            label.setAlignmentX(Component.LEFT_ALIGNMENT);
-            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-            panel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            add(Box.createHorizontalStrut(20));
-            add(label);
-            add(Box.createHorizontalStrut(20));
-            add(panel);
-            add(Box.createVerticalStrut(10));
-        }
-        add(Box.createVerticalStrut(100));
-    }
-
-    public void createBasicInformationPanel() {
-
-        // 使用者輸入活動資訊(活動名稱 活動時間 活動日期 活動地點 活動費用 人數限制)
-        actName = new JTextField("活動名稱", 20);
-        timeLabel = new JLabel("時間/ 日期: ");
-        date = new JTextField("YYYY-MM-DD", 10);
-        time = new JTextField("HH:MM", 5);
-
-        // information label
-        placeLabel = new JLabel("地點: ");
-        place = new JTextField(10);
-
-        // 當online被點選 表示活動在線上 因此不用輸入place(還沒成功)
-        online = new JRadioButton("線上");
-        if (online.isSelected()) {
-            place.setEnabled(false);
-        } else {
-            place.setEnabled(true);
-        }
-
-        // 當free被點選 表示免費活動 因此不用輸入price(還沒成功)
-        priceLabel = new JLabel("價錢: ");
-        price = new JTextField(10);
-        free = new JRadioButton("免費");
-        if (free.isSelected()) {
-            free.setEnabled(false);
-        } else {
-            free.setEnabled(true);
-        }
-
-        limitLabel = new JLabel("人數限制: ");
-        limitNumofPeople = new JTextField(10);
-
-        // --------settings----------
-        dueLabel = new JLabel("截止日期： ");
-        dueDate = new JTextField("YYYY-MM-DD", 10);
-        dueTime = new JTextField("HH:MM", 5);
-
-        addContactBtn = new JButton("+");
-        deleteContactBtn = new JButton("-");
-        deleteContactBtn.setVisible(false);
-        addContactBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addContact();
-                contactCount++;
-                add(deleteContactBtn);
-                deleteContactBtn.setVisible(true);
-                // 確保畫面更新，重新顯示新加入的面板
-                revalidate(); // 重新佈局
-                repaint(); // 重繪畫面
-
-            }
-        });
-
-        deleteContactBtn.addActionListener(e -> {
-            if (contactCount > 1) {
-                deleteContact();
-                contactCount--;
-            } else if (contactCount > 0) {
-                deleteContact();
-                contactCount--;
-                deleteContactBtn.setVisible(false);
-            }
-        });
-        labels = Arrays.asList(timeLabel, placeLabel, priceLabel, limitLabel, dueLabel);
-
-    }
-
-    public void addContact() {
-        JPanel contactJPanel = new JPanel();
-
-        contactType = new JTextField("social media", 5);
-        contactID = new JTextField("id", 10);
-
-        contactJPanel.add(contactType);
-        contactJPanel.add(contactID);
-
-        add(contactJPanel);
-
-    }
-
-    public void deleteContact() {
-        remove(contactType);
-        remove(contactID);
-    }
-
-    // layout
     public void createLayout() {
         p0 = new JPanel();
         p1 = new JPanel();
@@ -191,90 +32,134 @@ public class BasicInformation extends JPanel {
         p3 = new JPanel();
         p4 = new JPanel();
         ps1 = new JPanel();
-        JPanel blank = new JPanel();
-        panels = Arrays.asList(p1, p2, p3, p4, ps1);
 
-        // basic information layout
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        // basicInformation.setSize(650, 700);
         setVisible(true);
 
+        // 活動名稱
+        actName = new JTextField("活動名稱", 20);
         p0.add(actName);
 
-        p1.add(date);
-        p1.add(time);
+        // 日期 + 時間
+        timeLabel = new JLabel("時間/ 日期: ");
+        dateChooser = new JDateChooser();
+        dateChooser.setDateFormatString("yyyy-MM-dd");
 
+        timeSpinner = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, "HH:mm");
+        timeSpinner.setEditor(timeEditor);
+        timeSpinner.setValue(new Date());
+
+        p1.add(dateChooser);
+        p1.add(timeSpinner);
+
+        // 地點
+        placeLabel = new JLabel("地點: ");
+        place = new JTextField(10);
+        online = new JRadioButton("線上");
+        online.addActionListener(e -> place.setEnabled(!online.isSelected()));
         p2.add(place);
         p2.add(online);
 
+        // 價格
+        priceLabel = new JLabel("價錢: ");
+        price = new JTextField(10);
+        free = new JRadioButton("免費");
+        free.addActionListener(e -> {
+            if (free.isSelected()) {
+                price.setText("0");
+                price.setEnabled(false);
+            } else {
+                price.setEnabled(true);
+            }
+        });
         p3.add(price);
         p3.add(free);
 
+        // 人數限制
+        limitLabel = new JLabel("人數限制: ");
+        limitNumofPeople = new JTextField(10);
         p4.add(limitNumofPeople);
 
-        ps1.add(dueDate);
-        ps1.add(dueTime);
+        // 截止日期 + 時間
+        JLabel dueLabel = new JLabel("截止日期： ");
+        dueDateChooser = new JDateChooser();
+        dueDateChooser.setDateFormatString("yyyy-MM-dd");
 
-        // add(Box.createVerticalGlue());
+        dueTimeSpinner = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor dueEditor = new JSpinner.DateEditor(dueTimeSpinner, "HH:mm");
+        dueTimeSpinner.setEditor(dueEditor);
+        dueTimeSpinner.setValue(new Date());
 
-        // ---------------settings-------------------
+        ps1.add(dueDateChooser);
+        ps1.add(dueTimeSpinner);
 
-        setLabelFont();
-        setTfStyle();
-
+        // 加入元件
+        add(p0);
+        addRow(timeLabel, p1);
+        addRow(placeLabel, p2);
+        addRow(priceLabel, p3);
+        addRow(limitLabel, p4);
+        addRow(dueLabel, ps1);
+        add(Box.createVerticalStrut(100));
     }
 
-    // public void setBtnStyle(){
+    private void addRow(JLabel label, JPanel panel) {
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(Box.createHorizontalStrut(20));
+        add(label);
+        add(Box.createHorizontalStrut(20));
+        add(panel);
+        add(Box.createVerticalStrut(10));
+    }
 
-    // for (JTextField tf : tf) {
-    // final JTextField thisBtn = btn;
-    // thisBtn.setOpaque(true);
-    // thisBtn.setBorderPainted(false);
-    // thisBtn.setContentAreaFilled(true);
-    // thisBtn.setFocusPainted(false);
-
-    // thisBtn.setBackground(normalColor);
-
-    // thisBtn.getModel().addChangeListener(e -> {
-    // ButtonModel model = thisBtn.getModel();
-    // if (model.isPressed()) {
-    // thisBtn.setBackground(pressedColor);
-    // } else {
-    // thisBtn.setBackground(normalColor);
-    // }
-    // });
-    // }
-    // }
-
-    // 加在 class 裡最後面
+    // ----------------- Getter + 驗證 -----------------
 
     public String getName() {
-        return actName.getText();
+        String nameValue = actName.getText().trim();
+        if (nameValue.isEmpty()) throw new IllegalArgumentException("活動名稱不能為空");
+        return nameValue;
     }
 
     public String getDate() {
-        return date.getText();
+        Date d = dateChooser.getDate();
+        if (d == null) throw new IllegalArgumentException("請選擇活動日期");
+        return new SimpleDateFormat("yyyy-MM-dd").format(d);
     }
 
     public String getTime() {
-        return time.getText();
+        return new SimpleDateFormat("HH:mm").format((Date) timeSpinner.getValue());
     }
 
     public String getPlace() {
-        return place.getText();
+        if (!online.isSelected() && place.getText().trim().isEmpty())
+            throw new IllegalArgumentException("地點為必填欄位");
+        return place.getText().trim();
     }
 
     public String getPrice() {
-        return price.getText();
+        String value = price.getText().trim();
+        if (value.isEmpty()) throw new IllegalArgumentException("價錢不能為空");
+        if (!value.matches("\\d+")) throw new IllegalArgumentException("價錢必須為數字");
+        return value;
     }
 
     public int getLimitPeople() {
-        try {
-            return Integer.parseInt(limitNumofPeople.getText());
-        } catch (NumberFormatException e) {
-            return 0; // 或回傳預設值
-        }
+        String value = limitNumofPeople.getText().trim();
+        if (!value.matches("\\d+")) throw new IllegalArgumentException("人數限制必須為數字");
+        return Integer.parseInt(value);
     }
 
+    public String getDueDate() {
+        Date d = dueDateChooser.getDate();
+        if (d == null) throw new IllegalArgumentException("請選擇截止日期");
+        return new SimpleDateFormat("yyyy-MM-dd").format(d);
+    }
+
+    public String getDueTime() {
+        return new SimpleDateFormat("HH:mm").format((Date) dueTimeSpinner.getValue());
+    }
 }

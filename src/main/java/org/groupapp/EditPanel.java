@@ -31,42 +31,42 @@ public class EditPanel extends JPanel {
         createLayout();
     }
 
-// ------------------建立編輯模式的畫面------------------
+    // ------------------建立編輯模式的畫面------------------
     public final void createEditPanel() {
 
         back = new JButton("back");
         next = new JButton("next");
         confirm = new JButton("confirm");
-    
+
         confirm.addActionListener(e -> {
-            try (java.sql.Connection conn = DBUtil.getConnection()) {
-                String sql = "INSERT INTO activity (name, date, time, place, price, limit_people, due_date, due_time, intro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
-    
-                // 向子元件索取資料
-                BasicInformation info = (BasicInformation) basicInformation;
-                ActIntro intro = (ActIntro) actIntro;
-    
-                stmt.setString(1, info.getName());
-                stmt.setString(2, info.getDate());
-                stmt.setString(3, info.getTime());
-                stmt.setString(4, info.getPlace());
-                stmt.setString(5, info.getPrice());
-                stmt.setInt(6, info.getLimitPeople());
-                stmt.setString(9, intro.getIntro());
-    
-                int rows = stmt.executeUpdate();
-                if (rows > 0) {
-                    JOptionPane.showMessageDialog(this, "活動成功新增到資料庫！");
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "資料庫新增失敗：" + ex.getMessage());
+            // 向子元件索取資料
+            BasicInformation info = (BasicInformation) basicInformation;
+            ActIntro intro = (ActIntro) actIntro;
+
+            // 建立 Activity 物件
+            Activity act = new Activity();
+            act.setName(info.getName());
+            act.setDate(info.getDate());
+            act.setTime(info.getTime());
+            act.setPlace(info.getPlace());
+            act.setPrice(info.getPrice()); // 若你的 Activity class 有 price 欄位的話
+            act.setLimitPeople(info.getLimitPeople()); // 若有需要可新增這欄位
+            act.setDueDate(info.getDueDate());
+            act.setDueTime(info.getDueTime());
+            act.setIntro(intro.getIntro());
+
+            // 呼叫資料庫新增方法
+            boolean success = DBUtil.addActivity(act);
+            if (success) {
+                JOptionPane.showMessageDialog(this, "活動成功新增到資料庫！");
+            } else {
+                JOptionPane.showMessageDialog(this, "資料庫新增失敗，請確認登入狀態或欄位資料。");
             }
         });
+
     }
-    
-// ------------------建立切換畫面------------------
+
+    // ------------------建立切換畫面------------------
     public JPanel createCardLayoutPanel() {
         cardLayoutPanel = new JPanel();
         basicInformation = new BasicInformation();
@@ -123,7 +123,6 @@ public class EditPanel extends JPanel {
 
         setBtnStyle();
 
-        
     }
 
     private void updateButtonVisibility() {

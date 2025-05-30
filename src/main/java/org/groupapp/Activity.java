@@ -10,6 +10,8 @@ public class Activity {
     private String dueDate;
     private String dueTime;
     private String hostName;
+    private String price;           // 加入價格欄位
+    private int limitPeople;        // 加入人數限制欄位
 
     // Getter & Setter
     public int getId() {
@@ -52,7 +54,6 @@ public class Activity {
         this.place = place;
     }
 
-    // 加上對應方法
     public String getIntro() {
         return intro;
     }
@@ -68,7 +69,6 @@ public class Activity {
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
-    
 
     public String getDueTime() {
         return dueTime;
@@ -84,5 +84,21 @@ public class Activity {
 
     public void setHostName(String hostName) {
         this.hostName = hostName;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public int getLimitPeople() {
+        return limitPeople;
+    }
+
+    public void setLimitPeople(int limitPeople) {
+        this.limitPeople = limitPeople;
     }
 }
