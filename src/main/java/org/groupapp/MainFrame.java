@@ -11,6 +11,7 @@ import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -67,29 +68,30 @@ public class MainFrame extends JFrame {
 
         container.add(p0);
         container.add(p1);
+        container.add(Box.createVerticalStrut(10));
         container.add(p2);
         container.add(p3);
         panel.add(container);
 
         panel.setBorder(BorderFactory.createEmptyBorder(60, 100, 60, 100));
-        container.setBorder(BorderFactory.createEmptyBorder(30, 100, 60, 100));
+        container.setBorder(BorderFactory.createEmptyBorder(20, 100, 30, 100));
 
         panel.setBackground(new Color(246, 209, 86));
 
+        
         // 標題
         JLabel title = new JLabel("登入 Group");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        title.setFont(new Font(null, Font.BOLD, 22));
-        title.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
-        p0.add(Box.createVerticalStrut(15)); // 空間
+        title.setFont(new Font("Microsoft JhengHei", Font.BOLD, 22)); //  支援中文字型
+        title.setBorder(BorderFactory.createEmptyBorder(15, 0, 30, 0));
         p0.add(title);
 
         // 學號欄位
         JTextField idField = new JTextField();
         JLabel idLabel = new JLabel("學號：");
         idField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        idField.setFont(new Font(null, Font.PLAIN, 16));
-        idLabel.setFont(new Font(null, Font.PLAIN, 16));
+        idField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
+        idLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // 
         p1.add(idLabel);
         p1.add(idField);
 
@@ -97,8 +99,8 @@ public class MainFrame extends JFrame {
         JPasswordField pwdField = new JPasswordField();
         JLabel pwdLabel = new JLabel("密碼：");
         pwdField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        pwdLabel.setFont(new Font(null, Font.PLAIN, 16));
-        pwdField.setFont(new Font(null, Font.PLAIN, 16));
+        pwdLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // ✅
+        pwdField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); // ✅
         p2.add(pwdLabel);
         p2.add(pwdField);
 
@@ -109,7 +111,7 @@ public class MainFrame extends JFrame {
         loginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginBtn.setPreferredSize(new Dimension(120, 40));
         loginBtn.setMaximumSize(new Dimension(100, 40));
-        loginBtn.setFont(new Font(null, Font.BOLD, 16));
+        loginBtn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 16)); // ✅
         loginBtn.setBackground(new Color(246, 209, 86));
         loginBtn.setForeground(Color.black);
         loginBtn.setFocusPainted(false);
@@ -117,7 +119,6 @@ public class MainFrame extends JFrame {
         loginBtn.setOpaque(true);
         loginBtn.setBorderPainted(false);
         loginBtn.setContentAreaFilled(true);
-
         p3.add(loginBtn);
 
         // 註冊按鈕
@@ -151,4 +152,5 @@ public class MainFrame extends JFrame {
 
         return panel;
     }
+
 }

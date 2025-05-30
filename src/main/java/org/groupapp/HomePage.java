@@ -23,6 +23,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 public class HomePage extends JPanel {
@@ -34,7 +35,7 @@ public class HomePage extends JPanel {
     private JButton home, following, addActivity, personalInfo, searchBtn;
     JPanel actListPanel, followingPanel, addNew, personalPanel;
     JTextField searchBar;
-    Font font = new Font("Arial", Font.PLAIN, 20);
+    Font font = new Font("Arial", Font.PLAIN, 18);
     ArrayList<JButton> btns = new ArrayList<>();
     ArrayList<JButton> topbtns = new ArrayList<>();
     User user = new User();
@@ -46,13 +47,13 @@ public class HomePage extends JPanel {
         this.user = user;
         setLayout(new BorderLayout());
 
-        imageHome = new ImageIcon(getClass().getResource("/images/home.png"))
+        imageHome = new ImageIcon(getClass().getResource("/home.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageFollowing = new ImageIcon(getClass().getResource("/images/activity.png"))
+        imageFollowing = new ImageIcon(getClass().getResource("/following.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageAddNew = new ImageIcon(getClass().getResource("/images/add.png"))
+        imageAddNew = new ImageIcon(getClass().getResource("/add.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageInfo = new ImageIcon(getClass().getResource("/images/personalInfo.png"))
+        imageInfo = new ImageIcon(getClass().getResource("/person.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
 
         createCenterPanel();
@@ -89,9 +90,11 @@ public class HomePage extends JPanel {
         JButton btnAll = new JButton("全部");
         JButton btnAct = new JButton("活動");
         JButton btnGroup = new JButton("揪團");
+        // panel
         filterPanel.add(btnAll);
         filterPanel.add(btnAct);
         filterPanel.add(btnGroup);
+        // arrayList
         topbtns.add(btnAll);
         topbtns.add(btnAct);
         topbtns.add(btnGroup);
@@ -104,6 +107,7 @@ public class HomePage extends JPanel {
         centerPanel.setLayout(cardLayout);
 
         actListPanel = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(actListPanel);
         actListPanel.setLayout(new BoxLayout(actListPanel, BoxLayout.Y_AXIS));
         actListPanel.setBackground(Color.WHITE);
 
@@ -131,7 +135,7 @@ public class HomePage extends JPanel {
         centerPanel.add(followingPanel, "following");
         centerPanel.add(personalPanel, "my");
 
-        homePanel.add(actListPanel, BorderLayout.CENTER);
+        homePanel.add(scrollPane, BorderLayout.CENTER);
         add(centerPanel);
     }
 
@@ -172,17 +176,19 @@ public class HomePage extends JPanel {
         add(southPanel, BorderLayout.SOUTH);
     }
 
-    // ---------------中間的活動-------------------
-    private JPanel createActCard(Activity act, boolean isFavorited) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setPreferredSize(new Dimension(600, 100));
-        panel.setMaximumSize(new Dimension(600, 100));
-        panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        panel.setBackground(new Color(250, 250, 250));
+
+// ---------------中間的活動-------------------
+    private RoundedPanel createActCard(Activity act, boolean isFavorited) {
+        RoundedPanel panel = new RoundedPanel(15);
+        panel.setLayout(new BorderLayout());
+        panel.setPreferredSize(new Dimension(600, 120));
+        panel.setMaximumSize(new Dimension(600, 120));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 0));
+        panel.setBackground(new Color(246, 220, 135));
 
         String title = String.format(
-                "<html><b>%s%s</b><br>時間：%s %s<br>地點：%s</html>",
-                isFavorited ? "★ " : "",
+                "<html><div><b>%s%s</b><br><br>時間：%s %s<br>地點：%s<div></html>",
+                isFavorited ? "★ " : "  ",
                 act.getName(), act.getDate(), act.getTime(), act.getPlace());
 
         JLabel label = new JLabel(title);
