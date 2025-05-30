@@ -13,7 +13,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 
-
 public class DBUtil {
     private static final String SERVER = "jdbc:mysql://140.119.19.73:3315/";
     private static final String DATABASE = "TG13"; // 你的資料庫名稱
@@ -264,7 +263,6 @@ public class DBUtil {
         }
     }
 
-
     boolean success = false;
 
     // 檢查登入帳密是否正確
@@ -302,6 +300,7 @@ public class DBUtil {
     public boolean getSuccess() {
         return success;
     }
+
     public static boolean addActivity(Activity act) {
         String sql = "INSERT INTO activity (name, date, time, place, intro, due_date, due_time, host_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -311,7 +310,13 @@ public class DBUtil {
             String hostId = prefs.get("userId", null);
 
             if (hostId == null) {
-                System.out.println("⚠️ 尚未登入，無法新增活動");
+                JOptionPane.showMessageDialog(null, "請先登入才能新增活動", "未登入", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+
+            // 必填欄位檢查（你可以依需求擴充）
+            if (act.getName().isEmpty() || act.getDate().isEmpty() || act.getTime().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "請填寫活動名稱、日期和時間", "資料不完整", JOptionPane.WARNING_MESSAGE);
                 return false;
             }
 
@@ -326,13 +331,19 @@ public class DBUtil {
             stmt.setString(8, hostId);
 
             int rows = stmt.executeUpdate();
-            return rows > 0;
+            if (rows > 0) {
+                JOptionPane.showMessageDialog(null, "活動新增成功！", "成功", JOptionPane.INFORMATION_MESSAGE);
+                return true;
+            } else {
+                JOptionPane.showMessageDialog(null, "活動新增失敗，請稍後再試", "失敗", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "資料庫錯誤：" + e.getMessage(), "錯誤", JOptionPane.ERROR_MESSAGE);
             return false;
         }
-
     }
 
 }

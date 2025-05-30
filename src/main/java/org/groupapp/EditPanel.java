@@ -39,28 +39,33 @@ public class EditPanel extends JPanel {
         confirm = new JButton("confirm");
 
         confirm.addActionListener(e -> {
-            // 向子元件索取資料
-            BasicInformation info = (BasicInformation) basicInformation;
-            ActIntro intro = (ActIntro) actIntro;
+            try {
+                BasicInformation info = (BasicInformation) basicInformation;
+                ActIntro intro = (ActIntro) actIntro;
 
-            // 建立 Activity 物件
-            Activity act = new Activity();
-            act.setName(info.getName());
-            act.setDate(info.getDate());
-            act.setTime(info.getTime());
-            act.setPlace(info.getPlace());
-            act.setPrice(info.getPrice()); // 若你的 Activity class 有 price 欄位的話
-            act.setLimitPeople(info.getLimitPeople()); // 若有需要可新增這欄位
-            act.setDueDate(info.getDueDate());
-            act.setDueTime(info.getDueTime());
-            act.setIntro(intro.getIntro());
+                Activity act = new Activity();
+                act.setName(info.getName());
+                act.setDate(info.getDate());
+                act.setTime(info.getTime());
+                act.setPlace(info.getPlace()); // 如果這行丟例外 → 就會被 catch 到
+                act.setPrice(info.getPrice());
+                act.setLimitPeople(info.getLimitPeople());
+                act.setDueDate(info.getDueDate());
+                act.setDueTime(info.getDueTime());
+                act.setIntro(intro.getIntro());
 
-            // 呼叫資料庫新增方法
-            boolean success = DBUtil.addActivity(act);
-            if (success) {
-                JOptionPane.showMessageDialog(this, "活動成功新增到資料庫！");
-            } else {
-                JOptionPane.showMessageDialog(this, "資料庫新增失敗，請確認登入狀態或欄位資料。");
+                boolean success = DBUtil.addActivity(act);
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "活動成功新增到資料庫！");
+                } else {
+                    JOptionPane.showMessageDialog(this, "資料庫新增失敗，請確認登入狀態或欄位資料。");
+                }
+
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "輸入錯誤", JOptionPane.WARNING_MESSAGE);
+            } catch (Exception ex) {
+                ex.printStackTrace(); // 保留 debug
+                JOptionPane.showMessageDialog(this, "發生錯誤：" + ex.getMessage(), "系統錯誤", JOptionPane.ERROR_MESSAGE);
             }
         });
 
