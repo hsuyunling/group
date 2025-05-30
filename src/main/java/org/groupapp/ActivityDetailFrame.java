@@ -43,7 +43,7 @@ public class ActivityDetailFrame extends JFrame {
         JPanel topPanel = new JPanel(new BorderLayout());
         JLabel title = new JLabel(act.getName());
         title.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 6));
-        title.setFont(new Font("Arial", Font.BOLD, 20));
+        title.setFont(new Font("微軟正黑體", Font.BOLD, 20));
         topPanel.setBackground(new Color(246, 220, 135));
         topPanel.add(title, BorderLayout.WEST);
 
