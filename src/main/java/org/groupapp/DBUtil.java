@@ -302,7 +302,7 @@ public class DBUtil {
 
     public boolean getSuccess() {
         return success;
-
+    }
     public static boolean addActivity(Activity act) {
         String sql = "INSERT INTO activity (name, date, time, place, intro, due_date, due_time, host_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
