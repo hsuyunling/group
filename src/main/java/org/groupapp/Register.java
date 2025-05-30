@@ -1,10 +1,13 @@
-import java.awt.event.*;
-import java.awt.*;
-import javax.swing.*;
+package org.groupapp;
 
-public class Contact extends JFrame {
-    private final int FRAME_WIDTH = 650;
-    private final int FRAME_HEIGHT = 750;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import java.awt.*;
+
+public class Register extends JPanel {
     private final int FIELD_WIDTH = 20;
 
     private JPanel panel, namePanel, emailPanel, phonePanel, numberPanel, passWordPanel, smallPanel;
@@ -13,23 +16,16 @@ public class Contact extends JFrame {
     private JButton buttonFin;
 
     private String name, email, phone, number, passWord;
+    DBUtil u = new DBUtil();
 
     // constructor
-    public Contact() {
+    public Register() {
         createPanel();
-
-        setTitle("Contact");
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
     }
 
     public void createPanel() {
         smallPanel = new JPanel(new GridLayout(11, 1, -2, 5));
         panel = new JPanel(new BorderLayout());
-        // panel = new JPanel(new BoxLayout(panel,1));
-        // panel = new JPanel(new GridLayout(8,1, -2,5));
 
         // name
         textName = new JTextField(FIELD_WIDTH);
@@ -70,21 +66,20 @@ public class Contact extends JFrame {
         buttonFin.setPreferredSize(new Dimension(10, 50));
 
         // createButton
-        buttonFin.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        buttonFin.addActionListener(e -> {
+            // 拿資料
+            name = textName.getText();
+            email = textEmail.getText();
+            phone = textPhone.getText();
+            number = textNumber.getText();
+            passWord = textPassWord.getText();
+            u.execute(name, email, phone, number, passWord);
 
-                // 拿資料
-                name = textName.getText();
-                email = textEmail.getText();
-                phone = textPhone.getText();
-                number = textNumber.getText();
-                passWord = textPassWord.getText();
-
-                new Insert(name, email, phone, number, passWord);
-
-                JOptionPane.showMessageDialog(null, "儲存成功", "嘻嘻", JOptionPane.PLAIN_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(null, "儲存成功", "嘻嘻", JOptionPane.PLAIN_MESSAGE);
+            MainFrame f = new MainFrame();
+            f.setVisible(true);
         });
+
         buttonFin.setPreferredSize(new Dimension(200, 40));
         JPanel p1 = new JPanel();
         p1.add(buttonFin);

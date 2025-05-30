@@ -3,7 +3,7 @@
 
 # 編譯產生的 .class 檔案（如果誤產生在 src 中）
 *.class
-
+/bin/
 # IDE 與編輯器設定檔
 .vscode/
 .idea/

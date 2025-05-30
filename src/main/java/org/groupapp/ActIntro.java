@@ -1,13 +1,24 @@
 package org.groupapp;
 
-import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.Font;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class ActIntro extends JPanel {
     private JLabel introLabel;
     private JTextArea introArea;
     private JScrollPane scrollPane;
+    private Dimension size;
 
     public ActIntro(){
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20));
         createActIntroPanel();
         createLayout();
     }
@@ -17,9 +28,14 @@ public class ActIntro extends JPanel {
 
     	//使用者隨意輸入活動相關資訊（textArea）
 	public void createActIntroPanel(){
+        size = new Dimension(650, 600);
 		introLabel = new JLabel("活動簡介");
+        introLabel.setFont(new Font("微軟正黑體", Font.BOLD, 17));
 		introArea = new JTextArea();
+        introArea.setFont(new Font("微軟正黑體", Font.PLAIN, 17));
 		scrollPane = new JScrollPane(introArea); // 加捲軸
+        scrollPane.setPreferredSize(size);
+        scrollPane.setMaximumSize(size);
 	}
 
     public void createLayout(){
@@ -28,7 +44,10 @@ public class ActIntro extends JPanel {
         introArea.setWrapStyleWord(true); // 單詞邊界換行
 
         add(introLabel);
+        introLabel.setAlignmentX(CENTER_ALIGNMENT);
+        add(Box.createVerticalStrut(10));
         add(scrollPane);
+        scrollPane.setAlignmentX(CENTER_ALIGNMENT);
 
     }
     

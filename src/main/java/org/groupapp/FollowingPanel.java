@@ -1,13 +1,29 @@
 package org.groupapp;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 public class FollowingPanel extends JPanel {
     private JTabbedPane tabbedPane;
     private String userId;
+    Color normalColor = new Color(246, 209, 86);
+    Color pressedColor = new Color(195, 170, 87);
 
     public FollowingPanel() {
         setLayout(new BorderLayout());
@@ -21,6 +37,16 @@ public class FollowingPanel extends JPanel {
         tabbedPane = new JTabbedPane();
         reload(); // 初始載入
         add(tabbedPane, BorderLayout.CENTER);
+        tabbedPane.setFont(new Font("Arial", Font.BOLD, 18)); // 改字型
+
+        UIManager.put("TabbedPane.contentAreaColor", Color.white);   // 內容區背景
+        UIManager.put("TabbedPane.background", normalColor);   // 一般 tab 背景
+        tabbedPane.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));// 上、左、下、右各留 10 像素空間
+
+        
+        SwingUtilities.updateComponentTreeUI(tabbedPane); // 讓改變生效
+
+
     }
 
     public void reload() {
@@ -29,6 +55,8 @@ public class FollowingPanel extends JPanel {
         // ---------- 已報名 ----------
         JPanel joinedPanel = new JPanel();
         joinedPanel.setLayout(new BoxLayout(joinedPanel, BoxLayout.Y_AXIS));
+        joinedPanel.setBackground(Color.white);
+        joinedPanel.add(Box.createVerticalStrut(10));
         List<Activity> joinedActivities = DBUtil.getRegisteredActivities(userId);
         if (joinedActivities.isEmpty()) {
             joinedPanel.add(new JLabel("你尚未報名任何活動"));
@@ -42,6 +70,8 @@ public class FollowingPanel extends JPanel {
         // ---------- 已收藏 ----------
         JPanel favoritePanel = new JPanel();
         favoritePanel.setLayout(new BoxLayout(favoritePanel, BoxLayout.Y_AXIS));
+        favoritePanel.setBackground(Color.white);
+        favoritePanel.add(Box.createVerticalStrut(10));
         Set<Integer> favIds = DBUtil.getFavoriteActivityIds(userId);
         List<Activity> all = DBUtil.getAllActivities();
         boolean hasFav = false;
@@ -56,15 +86,14 @@ public class FollowingPanel extends JPanel {
             favoritePanel.add(new JLabel("你尚未收藏任何活動"));
         }
 
-        tabbedPane.add("已報名", new JScrollPane(joinedPanel));
-        tabbedPane.add("已收藏", new JScrollPane(favoritePanel));
+        tabbedPane.add("    已報名    ", new JScrollPane(joinedPanel));
+        tabbedPane.add("    已收藏    ", new JScrollPane(favoritePanel));
     }
 
     private JPanel createActCard(Activity act, boolean showCancelBtn, String userId, Runnable onChange) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setPreferredSize(new Dimension(550, 90));
         panel.setMaximumSize(new Dimension(550, 90));
-        panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
         JLabel label = new JLabel(String.format(
                 "<html><b>%s</b><br>時間：%s %s｜地點：%s</html>",
@@ -74,6 +103,12 @@ public class FollowingPanel extends JPanel {
 
         if (showCancelBtn) {
             JButton cancelBtn = new JButton("取消報名");
+            cancelBtn.setOpaque(true);
+            cancelBtn.setBorderPainted(false);
+            cancelBtn.setContentAreaFilled(true);
+            cancelBtn.setFocusPainted(false);
+
+            cancelBtn.setBackground(normalColor);
             cancelBtn.addActionListener(e -> {
                 int confirm = JOptionPane.showConfirmDialog(panel, "確定要取消報名？", "確認", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
@@ -91,6 +126,12 @@ public class FollowingPanel extends JPanel {
         } else {
             boolean alreadyRegistered = DBUtil.isUserRegistered(userId, act.getId());
             JButton joinBtn = new JButton(alreadyRegistered ? "已報名" : "報名");
+            joinBtn.setOpaque(true);
+            joinBtn.setBorderPainted(false);
+            joinBtn.setContentAreaFilled(true);
+            joinBtn.setFocusPainted(false);
+
+            joinBtn.setBackground(normalColor);
             joinBtn.setEnabled(!alreadyRegistered);
             
 
@@ -114,3 +155,5 @@ public class FollowingPanel extends JPanel {
     }
 
 }
+
+
