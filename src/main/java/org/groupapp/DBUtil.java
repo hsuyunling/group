@@ -252,6 +252,7 @@ public class DBUtil {
         try (Connection conn = getConnection()) {
             System.out.println("DB Connected");
             String query = "UPDATE `user` SET gender = ? WHERE name = ?;";
+
             try (PreparedStatement pstmt = conn.prepareStatement(query)) {
                 pstmt.setString(1, gender);
                 pstmt.setString(2, name);
@@ -296,6 +297,11 @@ public class DBUtil {
         return null;
     }
 
+    // 檢查成功登入與否
+    public boolean getSuccess() {
+        return success;
+    }
+
     // 編輯個人資訊
     public boolean updateUser(User user) {
         try (Connection conn = getConnection()) {
@@ -305,7 +311,7 @@ public class DBUtil {
                 pstmt.setString(2, user.getEmail());
                 pstmt.setString(3, user.getPhone());
                 pstmt.setString(4, user.getGender());
-                pstmt.setString(5, user.getId()); // id 當作唯一識別
+                pstmt.setString(5, user.getId()); // id 當作唯一辨識
                 pstmt.executeUpdate();
                 return true;
             }
@@ -315,9 +321,21 @@ public class DBUtil {
         }
     }
 
-    // 檢查成功註冊與否
-    public boolean getSuccess() {
-        return success;
+    // 檢查學號是否已註冊
+    public boolean isNumberExists(String number) {
+        try (Connection conn = getConnection()) {
+            String query = "SELECT COUNT(*) FROM user WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, number);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static boolean addActivity(Activity act) {
