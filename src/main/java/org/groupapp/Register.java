@@ -2,10 +2,14 @@ package org.groupapp;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,7 +21,7 @@ import javax.swing.JTextField;
 public class Register extends JPanel {
     private final int FIELD_WIDTH = 20;
 
-    private JPanel panel, namePanel, emailPanel, phonePanel, numberPanel, passWordPanel, smallPanel;
+    private JPanel namePanel, emailPanel, phonePanel, numberPanel, passWordPanel, smallPanel;
     private JLabel labelName, labelEmail, labelPhone, labelNumber, labelPassWord;
     private JTextField textName, textEmail, textPhone, textNumber, textPassWord;
     private JButton buttonFin, backbtn;
@@ -35,43 +39,44 @@ public class Register extends JPanel {
     }
 
     public void createPanel() {
+        setLayout(new BorderLayout());
         smallPanel = new JPanel(new GridLayout(11, 1, -2, 5));
-        panel = new JPanel(new BorderLayout());
+        smallPanel.setBorder(BorderFactory.createEmptyBorder(100, 140, 0, 140));
 
         // name
         textName = new JTextField(FIELD_WIDTH);
-        namePanel = new JPanel();
-        labelName = new JLabel("Name：");
-        namePanel.add(labelName);
-        namePanel.add(textName);
+        namePanel = new JPanel(new BorderLayout());
+        labelName = new JLabel("姓名：");
+        namePanel.add(labelName, BorderLayout.WEST);
+        namePanel.add(textName, BorderLayout.EAST);
 
         // email
         textEmail = new JTextField(FIELD_WIDTH);
-        emailPanel = new JPanel();
+        emailPanel = new JPanel(new BorderLayout());
         labelEmail = new JLabel("Email：");
-        emailPanel.add(labelEmail);
-        emailPanel.add(textEmail);
+        emailPanel.add(labelEmail, BorderLayout.WEST);
+        emailPanel.add(textEmail, BorderLayout.EAST);
 
         // phone
         textPhone = new JTextField(FIELD_WIDTH);
-        phonePanel = new JPanel();
+        phonePanel = new JPanel(new BorderLayout());
         labelPhone = new JLabel("電話號碼：");
-        phonePanel.add(labelPhone);
-        phonePanel.add(textPhone);
+        phonePanel.add(labelPhone, BorderLayout.WEST);
+        phonePanel.add(textPhone, BorderLayout.EAST);
 
         // 學號
         textNumber = new JTextField(FIELD_WIDTH);
-        numberPanel = new JPanel();
+        numberPanel = new JPanel(new BorderLayout());
         labelNumber = new JLabel("學號：");
-        numberPanel.add(labelNumber);
-        numberPanel.add(textNumber);
+        numberPanel.add(labelNumber, BorderLayout.WEST);
+        numberPanel.add(textNumber, BorderLayout.EAST);
 
         // 密碼
         textPassWord = new JTextField(FIELD_WIDTH);
-        passWordPanel = new JPanel();
+        passWordPanel = new JPanel(new BorderLayout());
         labelPassWord = new JLabel("密碼：");
-        passWordPanel.add(labelPassWord);
-        passWordPanel.add(textPassWord);
+        passWordPanel.add(labelPassWord, BorderLayout.WEST);
+        passWordPanel.add(textPassWord, BorderLayout.EAST);
 
         // ButtonFin 完成編輯，跳到登入頁
         buttonFin = new JButton("完成");
@@ -92,37 +97,39 @@ public class Register extends JPanel {
 
         // backbtn 返回登入頁面
         Image imgBack = new ImageIcon(getClass().getResource("/back.png"))
-        .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        .getImage().getScaledInstance(18, 31, Image.SCALE_SMOOTH);
         backbtn = new JButton();
         Icon backIcon = new ImageIcon(imgBack);
         backbtn.setIcon(backIcon);
+        backbtn.putClientProperty( "JButton.buttonType", "toolBarButton" );
+        backbtn.setOpaque(true);
+        backbtn.setBorderPainted(false);
+        backbtn.setContentAreaFilled(true);
+        backbtn.setFocusPainted(false);
+
         backbtn.addActionListener(e -> {
-            cardLayout.show(mainPanel, "login");
+          cardLayout.show(mainPanel, "login");
         });
 
         buttonFin.setPreferredSize(new Dimension(100, 40));
-        backbtn.setPreferredSize(new Dimension(100, 40));
+        backbtn.setPreferredSize(new Dimension(50, 30));
         JPanel p1 = new JPanel();
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.setBackground(new Color(217,217,217));
+        topPanel.add(Box.createRigidArea(new Dimension(10, 40)));        
         p1.add(buttonFin);
-        p1.add(backbtn);
-        panel.add(p1, BorderLayout.SOUTH);
+        topPanel.add(backbtn);
+        add(p1, BorderLayout.SOUTH);
+        add(topPanel, BorderLayout.NORTH);
 
-        // 把panel加到frame
-        JPanel p = new JPanel();
-        p.setSize(600, 1000);
-        smallPanel.add(p);
-        smallPanel.add(p);
-        smallPanel.add(p);
-        smallPanel.add(p);
-        smallPanel.add(p);
+
         smallPanel.add(namePanel);
         smallPanel.add(emailPanel);
         smallPanel.add(phonePanel);
         smallPanel.add(numberPanel);
         smallPanel.add(passWordPanel);
         smallPanel.add(p1);
-        panel.add(smallPanel, BorderLayout.CENTER);
-        add(panel);
+        add(smallPanel, BorderLayout.CENTER);
     }
 
 }
