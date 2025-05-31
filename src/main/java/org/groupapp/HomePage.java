@@ -34,7 +34,7 @@ public class HomePage extends JPanel {
     private JPanel southPanel, northPanel, centerPanel;
     private JButton home, following, addActivity, personalInfo, searchBtn;
     JPanel actListPanel, followingPanel, addNew, personalPanel;
-    JTextField searchBar;
+    JTextField searchField;
     Font font = new Font("Arial", Font.PLAIN, 18);
     ArrayList<JButton> btns = new ArrayList<>();
     User user = new User();
@@ -58,7 +58,7 @@ public class HomePage extends JPanel {
         imageInfo = new ImageIcon(getClass().getResource("/person.png"))
                 .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         imageSearch = new ImageIcon(getClass().getResource("/search.png"))
-                .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+                .getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
 
         createCenterPanel();
         createSouthPanel();
@@ -90,15 +90,19 @@ public class HomePage extends JPanel {
         homePanel.setLayout(new BorderLayout());
         homePanel.add(northPanel, BorderLayout.NORTH);
 
-        JTextField questionField = new JTextField();
-        // questionField.setPreferredSize(new Dimension());
+        searchField = new JTextField();
+        searchField.setPreferredSize(new Dimension(200, 35));
+        searchField.setMaximumSize(new Dimension(200, 35));
+        searchField.putClientProperty("JComponent.roundRect", true);
+        searchField.putClientProperty("JTextField.placeholderText", "搜尋揪團...");
 
-        JButton search = new JButton();
+        searchBtn = new JButton();
         Icon searchIcon = new ImageIcon(imageSearch);
-        search.setIcon(searchIcon);
+        searchBtn.setIcon(searchIcon);
 
-        northPanel.add(questionField);
-        northPanel.add(search);
+        northPanel.add(searchField);
+        northPanel.add(searchBtn);
+        northPanel.add(Box.createRigidArea(new Dimension(10,0)));
 
 
         northPanel.setBackground(normalColor);
@@ -109,6 +113,7 @@ public class HomePage extends JPanel {
         actListPanel = new JPanel();
         JScrollPane scrollPane = new JScrollPane(actListPanel);
         actListPanel.setLayout(new BoxLayout(actListPanel, BoxLayout.Y_AXIS));
+        actListPanel.add(Box.createVerticalStrut(10));
         actListPanel.setBackground(Color.WHITE);
 
         List<Activity> activities = DBUtil.getAllActivities();
@@ -218,6 +223,7 @@ public class HomePage extends JPanel {
         // ---------------底下四個按鈕-------------------
         for (JButton btn : btns) {
             final JButton thisBtn = btn;
+            thisBtn.putClientProperty( "JButton.buttonType", "square" );
             thisBtn.setOpaque(true);
             thisBtn.setBorderPainted(false);
             thisBtn.setContentAreaFilled(true);
@@ -235,6 +241,13 @@ public class HomePage extends JPanel {
             });
             southPanel.add(thisBtn);
         }
+
+        
+        searchBtn.putClientProperty( "JButton.buttonType", "toolBarButton" );
+        searchBtn.setOpaque(true);
+        searchBtn.setBorderPainted(false);
+        searchBtn.setContentAreaFilled(true);
+        searchBtn.setFocusPainted(false);
 
     }
 

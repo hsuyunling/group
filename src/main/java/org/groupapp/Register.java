@@ -1,11 +1,18 @@
 package org.groupapp;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Image;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import java.awt.*;
 
 public class Register extends JPanel {
     private final int FIELD_WIDTH = 20;
@@ -84,7 +91,11 @@ public class Register extends JPanel {
         });
 
         // backbtn 返回登入頁面
-        backbtn = new JButton("返回");
+        Image imgBack = new ImageIcon(getClass().getResource("/back.png"))
+        .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        backbtn = new JButton();
+        Icon backIcon = new ImageIcon(imgBack);
+        backbtn.setIcon(backIcon);
         backbtn.addActionListener(e -> {
             cardLayout.show(mainPanel, "login");
         });

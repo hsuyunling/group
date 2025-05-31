@@ -118,10 +118,13 @@ public class MainFrame extends JFrame {
         JButton registerBtn = new JButton("註冊");
         registerBtn.setFocusPainted(false);
         registerBtn.setOpaque(true);
+        registerBtn.setContentAreaFilled(true);
         registerBtn.setBackground(color);
         registerBtn.setBorderPainted(false);
         registerBtn.setPreferredSize(new Dimension(60, 40));
+        registerBtn.setMaximumSize(new Dimension(60, 40));
 
+        
         p3.add(Box.createRigidArea(new Dimension(70, 0))); // 開頭空格
         p3.add(loginBtn);
         // p3.add(Box.createRigidArea(new Dimension(5, 0))); // login 和 register 之間空格
