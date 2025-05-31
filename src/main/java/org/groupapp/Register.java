@@ -40,8 +40,8 @@ public class Register extends JPanel {
 
     public void createPanel() {
         setLayout(new BorderLayout());
-        smallPanel = new JPanel(new GridLayout(11, 1, -2, 5));
-        smallPanel.setBorder(BorderFactory.createEmptyBorder(100, 140, 0, 140));
+        smallPanel = new JPanel(new GridLayout(5, 1, -2, 5));
+        smallPanel.setBorder(BorderFactory.createEmptyBorder(70, 140, 0, 140));
 
         // name
         textName = new JTextField(FIELD_WIDTH);
@@ -112,13 +112,29 @@ public class Register extends JPanel {
         });
 
         buttonFin.setPreferredSize(new Dimension(100, 40));
-        backbtn.setPreferredSize(new Dimension(50, 30));
+        backbtn.setPreferredSize(new Dimension(50, 20));
         JPanel p1 = new JPanel();
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel topPanel = new JPanel(new BorderLayout());
+        JPanel labelPanel = new JPanel();
+        JPanel backBtnPanel = new JPanel();
+
+        backBtnPanel.add(backbtn);
+        backBtnPanel.setBackground(new Color(217,217,217));
+
+        labelPanel.add(new JLabel("註冊新帳號！"));
+        labelPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        labelPanel.setBackground(new Color(217,217,217));
+
         topPanel.setBackground(new Color(217,217,217));
-        topPanel.add(Box.createRigidArea(new Dimension(10, 40)));        
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+
         p1.add(buttonFin);
-        topPanel.add(backbtn);
+        p1.setBorder(BorderFactory.createEmptyBorder(20, 0, 280, 0));
+
+        topPanel.add(backBtnPanel, BorderLayout.WEST);
+        topPanel.add(labelPanel, BorderLayout.CENTER);
+        topPanel.add(Box.createRigidArea(new Dimension( 50, 40)), BorderLayout.EAST);        
+
         add(p1, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
 
@@ -128,7 +144,7 @@ public class Register extends JPanel {
         smallPanel.add(phonePanel);
         smallPanel.add(numberPanel);
         smallPanel.add(passWordPanel);
-        smallPanel.add(p1);
+
         add(smallPanel, BorderLayout.CENTER);
     }
 
