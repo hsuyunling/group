@@ -36,7 +36,20 @@ public class User {
         return gender;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public void setGender(String gender) {
         this.gender = gender;
     }
+
 }

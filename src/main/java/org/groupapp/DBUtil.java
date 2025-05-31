@@ -256,7 +256,6 @@ public class DBUtil {
                 pstmt.setString(1, gender);
                 pstmt.setString(2, name);
                 pstmt.executeUpdate();
-                JOptionPane.showMessageDialog(null, "儲存成功！", "嘻嘻", JOptionPane.PLAIN_MESSAGE);
                 return true;
             }
         } catch (SQLException e) {
@@ -286,19 +285,37 @@ public class DBUtil {
                     String gender = rs.getString("gender");
 
                     return new User(id, name, email, phone, gender);
-
                 } else {
                     success = false;
                     return null;
                 }
             }
-
         } catch (SQLException e) {
             System.out.println("資料庫錯誤：" + e.getMessage());
         }
         return null;
     }
 
+    // 編輯個人資訊
+    public boolean updateUser(User user) {
+        try (Connection conn = getConnection()) {
+            String query = "UPDATE `user` SET name = ?, email = ?, phone = ?, gender = ? WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, user.getName());
+                pstmt.setString(2, user.getEmail());
+                pstmt.setString(3, user.getPhone());
+                pstmt.setString(4, user.getGender());
+                pstmt.setString(5, user.getId()); // id 當作唯一識別
+                pstmt.executeUpdate();
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println("資料庫錯誤：" + e.getMessage());
+            return false;
+        }
+    }
+
+    // 檢查成功註冊與否
     public boolean getSuccess() {
         return success;
     }
@@ -316,7 +333,7 @@ public class DBUtil {
                 return false;
             }
 
-            // 必填欄位檢查（你可以依需求擴充）
+            // 必填欄位檢查
             if (act.getName().isEmpty() || act.getDate().isEmpty() || act.getTime().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "請填寫活動名稱、日期和時間", "資料不完整", JOptionPane.WARNING_MESSAGE);
                 return false;
