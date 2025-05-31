@@ -11,7 +11,7 @@ public class Register extends JPanel {
     private final int FIELD_WIDTH = 20;
 
     private JPanel panel, namePanel, emailPanel, phonePanel, numberPanel, passWordPanel, smallPanel;
-    private JLabel labelName, labelEmail, labelPhone, labelNumber, labelPassWord;
+    private JLabel labelName, labelEmail, labelPhone, labelNumber, labelPassWord, hintLabel;
     private JTextField textName, textEmail, textPhone, textNumber, textPassWord;
     private JButton buttonFin, backbtn;
 
@@ -96,6 +96,9 @@ public class Register extends JPanel {
         p1.add(backbtn);
         panel.add(p1, BorderLayout.SOUTH);
 
+        // 學號不可更改提醒
+        hintLabel = new JLabel("請仔細檢查學號，後續無法更改");
+
         // 把panel加到frame
         JPanel p = new JPanel();
         p.setSize(600, 1000);
@@ -110,6 +113,8 @@ public class Register extends JPanel {
         smallPanel.add(numberPanel);
         smallPanel.add(passWordPanel);
         smallPanel.add(p1);
+        smallPanel.add(hintLabel);
+
         panel.add(smallPanel, BorderLayout.CENTER);
         add(panel);
     }
