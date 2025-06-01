@@ -21,14 +21,16 @@ public class FollowingPanel extends JPanel {
         userId = ActivityDetailFrame.getCurrentUserId();
 
         if (userId == null) {
-            add(new JLabel("尚未登入"), BorderLayout.CENTER);
+            JLabel loginLabel = new JLabel("尚未登入");
+            loginLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 18));
+            add(loginLabel, BorderLayout.CENTER);
             return;
         }
 
         tabbedPane = new JTabbedPane();
         reload(); // 初始載入
         add(tabbedPane, BorderLayout.CENTER);
-        tabbedPane.setFont(new Font("Arial", Font.BOLD, 18));
+        tabbedPane.setFont(new Font("Microsoft JhengHei", Font.BOLD, 18));
 
         UIManager.put("TabbedPane.contentAreaColor", Color.white);
         UIManager.put("TabbedPane.background", normalColor);
@@ -40,11 +42,15 @@ public class FollowingPanel extends JPanel {
         tabbedPane.removeAll();
 
         JPanel joinedPanel = new JPanel();
-        joinedPanel.add(new JLabel("載入中..."));
+        JLabel loadingLabel1 = new JLabel("載入中...");
+        loadingLabel1.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16));
+        joinedPanel.add(loadingLabel1);
         tabbedPane.add("    已報名    ", new JScrollPane(joinedPanel));
 
         JPanel favoritePanel = new JPanel();
-        favoritePanel.add(new JLabel("載入中..."));
+        JLabel loadingLabel2 = new JLabel("載入中...");
+        loadingLabel2.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16));
+        favoritePanel.add(loadingLabel2);
         tabbedPane.add("    已收藏    ", new JScrollPane(favoritePanel));
 
         new SwingWorker<List<Object>, Void>() {
@@ -71,7 +77,9 @@ public class FollowingPanel extends JPanel {
                     joined.add(Box.createVerticalStrut(10));
 
                     if (joinedActivities.isEmpty()) {
-                        joined.add(new JLabel("你尚未報名任何活動"));
+                        JLabel emptyLabel = new JLabel("你尚未報名任何活動");
+                        emptyLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16));
+                        joined.add(emptyLabel);
                     } else {
                         for (Activity act : joinedActivities) {
                             joined.add(createActCard(act, true, userId, FollowingPanel.this::reload));
@@ -94,7 +102,9 @@ public class FollowingPanel extends JPanel {
                         }
                     }
                     if (!hasFav) {
-                        favorite.add(new JLabel("你尚未收藏任何活動"));
+                        JLabel emptyFavLabel = new JLabel("你尚未收藏任何活動");
+                        emptyFavLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16));
+                        favorite.add(emptyFavLabel);
                     }
 
                     tabbedPane.setComponentAt(0, new JScrollPane(joined));
@@ -114,13 +124,15 @@ public class FollowingPanel extends JPanel {
         panel.setMaximumSize(new Dimension(550, 90));
 
         JLabel label = new JLabel(String.format(
-                "<html><b>%s</b><br>時間：%s %s｜地點：%s</html>",
+                "<html><div style='font-family: Microsoft JhengHei;'><b>%s</b><br>時間：%s %s｜地點：%s</div></html>",
                 act.getName(), act.getDate(), act.getTime(), act.getPlace()));
+        label.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16));
         label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.add(label, BorderLayout.CENTER);
 
         if (showCancelBtn) {
             JButton cancelBtn = new JButton("取消報名");
+            cancelBtn.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 14));
             cancelBtn.setOpaque(true);
             cancelBtn.setBorderPainted(false);
             cancelBtn.setContentAreaFilled(true);
@@ -144,6 +156,7 @@ public class FollowingPanel extends JPanel {
         } else {
             boolean alreadyRegistered = DBUtil.isUserRegistered(userId, act.getId());
             JButton joinBtn = new JButton(alreadyRegistered ? "已報名" : "報名");
+            joinBtn.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 14));
             joinBtn.setOpaque(true);
             joinBtn.setBorderPainted(false);
             joinBtn.setContentAreaFilled(true);
