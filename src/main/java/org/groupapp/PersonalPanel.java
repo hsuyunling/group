@@ -15,13 +15,20 @@ public class PersonalPanel extends JPanel {
     DBUtil db = new DBUtil();
     String imageURL = "";
 
-    // Consturctor
+    // Constructor
     public PersonalPanel(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("用戶對象不能為空");
+        }
         this.user = user;
         createPanel();
     }
 
     public void createPanel() {
+        if (user == null) {
+            throw new IllegalStateException("用戶對象未初始化");
+        }
+        
         image();
 
         panel = new JPanel();
@@ -32,13 +39,13 @@ public class PersonalPanel extends JPanel {
         IDPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         genderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        labelName = new JLabel("姓名：" + user.getName());
+        labelName = new JLabel("姓名：" + (user.getName() != null ? user.getName() : "未設置"));
         namePanel.add(labelName);
-        labelEmail = new JLabel("email：" + user.getEmail());
+        labelEmail = new JLabel("email：" + (user.getEmail() != null ? user.getEmail() : "未設置"));
         emailPanel.add(labelEmail);
-        labelPhone = new JLabel("手機號碼：" + user.getPhone());
+        labelPhone = new JLabel("手機號碼：" + (user.getPhone() != null ? user.getPhone() : "未設置"));
         phonePanel.add(labelPhone);
-        labelID = new JLabel("ID：" + user.getId());
+        labelID = new JLabel("ID：" + (user.getId() != null ? user.getId() : "未設置"));
         IDPanel.add(labelID);
 
         panel.add(namePanel);
@@ -88,16 +95,28 @@ public class PersonalPanel extends JPanel {
 
     // 照片
     public void image() {
-        if (user.getGender() == null) {
+        if (user == null) {
+            throw new IllegalStateException("用戶對象未初始化");
+        }
+
+        String gender = user.getGender();
+        if (gender == null) {
             imageURL = "https://thumb.ac-illust.com/83/83424bf45d0570a09649ac394b40e118_w.jpeg";
-        } else if (user.getGender().equals("男")) {
-            imageURL = "https://drive.google.com/uc?export=view&id=1INQQcd4E1C3foBaHji2EPNvZZTsliIAP";
-        } else if (user.getGender().equals("女")) {
-            imageURL = "https://drive.google.com/uc?export=view&id=1kLjMKDJvSdkwUaI59Ccy_6TYaOjdR2CM";
-        } else if (user.getGender().equals("不透漏")) {
-            imageURL = "https://images.icon-icons.com/3037/PNG/512/agender_gender_genderless_no_gender_genderqueer_icon_189179.png";
-        } else
-            imageURL = "https://media.istockphoto.com/id/584764738/zh/%E5%90%91%E9%87%8F/realistic-full-moon.jpg?s=1024x1024&w=is&k=20&c=G0ftKdRiSC11e6xWBtEV6idQeaIOE_r7hBi14fIuCJA=";
+        } else {
+            switch (gender) {
+                case "男":
+                    imageURL = "https://drive.google.com/uc?export=view&id=1INQQcd4E1C3foBaHji2EPNvZZTsliIAP";
+                    break;
+                case "女":
+                    imageURL = "https://drive.google.com/uc?export=view&id=1kLjMKDJvSdkwUaI59Ccy_6TYaOjdR2CM";
+                    break;
+                case "不透漏":
+                    imageURL = "https://images.icon-icons.com/3037/PNG/512/agender_gender_genderless_no_gender_genderqueer_icon_189179.png";
+                    break;
+                default:
+                    imageURL = "https://media.istockphoto.com/id/584764738/zh/%E5%90%91%E9%87%8F/realistic-full-moon.jpg?s=1024x1024&w=is&k=20&c=G0ftKdRiSC11e6xWBtEV6idQeaIOE_r7hBi14fIuCJA=";
+            }
+        }
 
         try {
 

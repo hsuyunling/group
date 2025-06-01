@@ -7,17 +7,8 @@ import java.awt.Font;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
+import javax.swing.border.Border;
 
 public class FollowingPanel extends JPanel {
     private JTabbedPane tabbedPane;
@@ -37,57 +28,84 @@ public class FollowingPanel extends JPanel {
         tabbedPane = new JTabbedPane();
         reload(); // 初始載入
         add(tabbedPane, BorderLayout.CENTER);
-        tabbedPane.setFont(new Font("Arial", Font.BOLD, 18)); // 改字型
+        tabbedPane.setFont(new Font("Arial", Font.BOLD, 18));
 
-        UIManager.put("TabbedPane.contentAreaColor", Color.white);   // 內容區背景
-        UIManager.put("TabbedPane.background", normalColor);   // 一般 tab 背景
-        tabbedPane.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));// 上、左、下、右各留 10 像素空間
-
-        
-        SwingUtilities.updateComponentTreeUI(tabbedPane); // 讓改變生效
-
-
+        UIManager.put("TabbedPane.contentAreaColor", Color.white);
+        UIManager.put("TabbedPane.background", normalColor);
+        tabbedPane.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        SwingUtilities.updateComponentTreeUI(tabbedPane);
     }
 
     public void reload() {
-        tabbedPane.removeAll(); // 清除所有分頁
+        tabbedPane.removeAll();
 
-        // ---------- 已報名 ----------
         JPanel joinedPanel = new JPanel();
-        joinedPanel.setLayout(new BoxLayout(joinedPanel, BoxLayout.Y_AXIS));
-        joinedPanel.setBackground(Color.white);
-        joinedPanel.add(Box.createVerticalStrut(10));
-        List<Activity> joinedActivities = DBUtil.getRegisteredActivities(userId);
-        if (joinedActivities.isEmpty()) {
-            joinedPanel.add(new JLabel("你尚未報名任何活動"));
-        } else {
-            for (Activity act : joinedActivities) {
-                joinedPanel.add(createActCard(act, true, userId, this::reload));
-                joinedPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-            }
-        }
-
-        // ---------- 已收藏 ----------
-        JPanel favoritePanel = new JPanel();
-        favoritePanel.setLayout(new BoxLayout(favoritePanel, BoxLayout.Y_AXIS));
-        favoritePanel.setBackground(Color.white);
-        favoritePanel.add(Box.createVerticalStrut(10));
-        Set<Integer> favIds = DBUtil.getFavoriteActivityIds(userId);
-        List<Activity> all = DBUtil.getAllActivities();
-        boolean hasFav = false;
-        for (Activity act : all) {
-            if (favIds.contains(act.getId())) {
-                favoritePanel.add(createActCard(act, false, userId, this::reload));
-                favoritePanel.add(Box.createRigidArea(new Dimension(0, 10)));
-                hasFav = true;
-            }
-        }
-        if (!hasFav) {
-            favoritePanel.add(new JLabel("你尚未收藏任何活動"));
-        }
-
+        joinedPanel.add(new JLabel("載入中..."));
         tabbedPane.add("    已報名    ", new JScrollPane(joinedPanel));
+
+        JPanel favoritePanel = new JPanel();
+        favoritePanel.add(new JLabel("載入中..."));
         tabbedPane.add("    已收藏    ", new JScrollPane(favoritePanel));
+
+        new SwingWorker<List<Object>, Void>() {
+            @Override
+            protected List<Object> doInBackground() throws Exception {
+                List<Activity> joinedActivities = DBUtil.getRegisteredActivities(userId);
+                Set<Integer> favIds = DBUtil.getFavoriteActivityIds(userId);
+                List<Activity> all = DBUtil.getAllActivities();
+                return List.of(joinedActivities, favIds, all);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    List<Object> result = get();
+                    List<Activity> joinedActivities = (List<Activity>) result.get(0);
+                    Set<Integer> favIds = (Set<Integer>) result.get(1);
+                    List<Activity> allActivities = (List<Activity>) result.get(2);
+
+                    // 已報名
+                    JPanel joined = new JPanel();
+                    joined.setLayout(new BoxLayout(joined, BoxLayout.Y_AXIS));
+                    joined.setBackground(Color.white);
+                    joined.add(Box.createVerticalStrut(10));
+
+                    if (joinedActivities.isEmpty()) {
+                        joined.add(new JLabel("你尚未報名任何活動"));
+                    } else {
+                        for (Activity act : joinedActivities) {
+                            joined.add(createActCard(act, true, userId, FollowingPanel.this::reload));
+                            joined.add(Box.createRigidArea(new Dimension(0, 10)));
+                        }
+                    }
+
+                    // 已收藏
+                    JPanel favorite = new JPanel();
+                    favorite.setLayout(new BoxLayout(favorite, BoxLayout.Y_AXIS));
+                    favorite.setBackground(Color.white);
+                    favorite.add(Box.createVerticalStrut(10));
+
+                    boolean hasFav = false;
+                    for (Activity act : allActivities) {
+                        if (favIds.contains(act.getId())) {
+                            favorite.add(createActCard(act, false, userId, FollowingPanel.this::reload));
+                            favorite.add(Box.createRigidArea(new Dimension(0, 10)));
+                            hasFav = true;
+                        }
+                    }
+                    if (!hasFav) {
+                        favorite.add(new JLabel("你尚未收藏任何活動"));
+                    }
+
+                    tabbedPane.setComponentAt(0, new JScrollPane(joined));
+                    tabbedPane.setComponentAt(1, new JScrollPane(favorite));
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(FollowingPanel.this, "資料載入失敗：" + ex.getMessage());
+                }
+            }
+        }.execute();
     }
 
     private JPanel createActCard(Activity act, boolean showCancelBtn, String userId, Runnable onChange) {
@@ -133,16 +151,15 @@ public class FollowingPanel extends JPanel {
 
             joinBtn.setBackground(normalColor);
             joinBtn.setEnabled(!alreadyRegistered);
-            
 
             joinBtn.addActionListener(e -> {
                 boolean success = DBUtil.registerUserToActivityIfNotExists(userId, act.getId());
                 if (success) {
                     JOptionPane.showMessageDialog(panel, "報名成功");
                     joinBtn.setText("已報名");
-                    joinBtn.setEnabled(false); // 🔒 不能再按
+                    joinBtn.setEnabled(false);
                     if (onChange != null)
-                        onChange.run(); // 🔁 讓頁面能更新（例如從收藏頁移除）
+                        onChange.run();
                 } else {
                     JOptionPane.showMessageDialog(panel, "報名失敗或已報名");
                 }
@@ -153,7 +170,4 @@ public class FollowingPanel extends JPanel {
 
         return panel;
     }
-
 }
-
-
