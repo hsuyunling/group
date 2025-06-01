@@ -270,19 +270,21 @@ public class DBUtil {
     }
 
     // 輸入非必要資料，性別
-    public void execute(String gender) {
+    public boolean execute(String gender, String name) {
         // try-with 確保關掉
         try (Connection conn = getConnection()) {
             System.out.println("DB Connected");
-            String query = "INSERT INTO `user`(gender) VALUES(?)";
+            String query = "UPDATE `user` SET gender = ? WHERE name = ?;";
+
             try (PreparedStatement pstmt = conn.prepareStatement(query)) {
                 pstmt.setString(1, gender);
+                pstmt.setString(2, name);
                 pstmt.executeUpdate();
-
-                JOptionPane.showMessageDialog(null, "儲存成功！", "嘻嘻", JOptionPane.PLAIN_MESSAGE);
+                return true;
             }
         } catch (SQLException e) {
             System.out.println("資料庫錯誤：" + e.getMessage());
+            return false;
         }
     }
 
@@ -324,13 +326,11 @@ public class DBUtil {
 
                     System.out.println("使用者驗證成功：" + user.getName());
                     return user;
-
                 } else {
                     System.out.println("使用者驗證失敗：帳號或密碼錯誤");
                     return null;
                 }
             }
-
         } catch (SQLException e) {
             System.err.println("資料庫連接錯誤：" + e.getMessage());
             e.printStackTrace();
@@ -342,8 +342,45 @@ public class DBUtil {
         }
     }
 
+    // 檢查成功登入與否
     public boolean getSuccess() {
         return success;
+    }
+
+    // 編輯個人資訊
+    public boolean updateUser(User user) {
+        try (Connection conn = getConnection()) {
+            String query = "UPDATE `user` SET name = ?, email = ?, phone = ?, gender = ? WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, user.getName());
+                pstmt.setString(2, user.getEmail());
+                pstmt.setString(3, user.getPhone());
+                pstmt.setString(4, user.getGender());
+                pstmt.setString(5, user.getId()); // id 當作唯一辨識
+                pstmt.executeUpdate();
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println("資料庫錯誤：" + e.getMessage());
+            return false;
+        }
+    }
+
+    // 檢查學號是否已註冊
+    public boolean isNumberExists(String number) {
+        try (Connection conn = getConnection()) {
+            String query = "SELECT COUNT(*) FROM user WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, number);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static boolean addActivity(Activity act) {
@@ -359,7 +396,7 @@ public class DBUtil {
                 return false;
             }
 
-            // 必填欄位檢查（你可以依需求擴充）
+            // 必填欄位檢查
             if (act.getName().isEmpty() || act.getDate().isEmpty() || act.getTime().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "請填寫活動名稱、日期和時間", "資料不完整", JOptionPane.WARNING_MESSAGE);
                 return false;
