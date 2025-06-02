@@ -1,29 +1,14 @@
-// HomePage.java（已優化）
+// HomePage.java（已整合快取與縮放）
 package org.groupapp;
 
-// Java AWT 僅引入實際需要的類別（例如 Color, Dimension 等）
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Image;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Component;
-
-// 只使用 java.util 中實際需要的類型，避免 List 混淆
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-// 並發工具
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-
-// Swing
 import javax.swing.*;
 
 public class HomePage extends JPanel {
@@ -32,8 +17,10 @@ public class HomePage extends JPanel {
     private static final int FRAME_HEIGHT = 750;
     CardLayout cardLayout = new CardLayout();
     private JPanel southPanel, northPanel, centerPanel;
-    private JButton home, following, addActivity, personalInfo;
+    private JButton home, following, addActivity, personalInfo, searchBtn;
     JPanel actListPanel, followingPanel, addNew, personalPanel;
+
+    JTextField searchField;
     Font font = new Font("Microsoft JhengHei", Font.PLAIN, 18);
     ArrayList<JButton> btns = new ArrayList<>();
     User user;
@@ -47,29 +34,18 @@ public class HomePage extends JPanel {
     private static final long CACHE_DURATION = 30000;
 
     public HomePage(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("用戶對象不能為空");
-        }
+        if (user == null) throw new IllegalArgumentException("用戶對象不能為空");
         this.user = user;
         setLayout(new BorderLayout());
         initBasicUI();
         loadResourcesInBackground();
     }
 
-    private void preloadImages() {
-        loadImageToCache("/home.png", "home");
-        loadImageToCache("/following.png", "following");
-        loadImageToCache("/add.png", "add");
-        loadImageToCache("/person.png", "person");
-        loadImageToCache("/search.png", "search");
-    }
-
-    private void loadImageToCache(String resourcePath, String key) {
+    private void loadImageToCache(String resourcePath, String key, int width, int height) {
         if (!iconCache.containsKey(key)) {
             try {
                 Image image = new ImageIcon(getClass().getResource(resourcePath))
-                        .getImage()
-                        .getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+                        .getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
                 iconCache.put(key, new ImageIcon(image));
             } catch (Exception e) {
                 System.err.println("載入圖片失敗 " + resourcePath + ": " + e.getMessage());
@@ -90,39 +66,35 @@ public class HomePage extends JPanel {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(normalColor);
-        
-        // 創建一個專門的標籤面板
+
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
         labelPanel.setBackground(normalColor);
-        
+
         JLabel loadingLabel = new JLabel("載入中...");
         loadingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         loadingLabel.setFont(new Font("Microsoft JhengHei", Font.BOLD, 18));
-        loadingLabel.setName("loadingLabel"); // 給標籤一個名字，方便之後找到它
-        
+        loadingLabel.setName("loadingLabel");
+
         labelPanel.add(Box.createVerticalGlue());
         labelPanel.add(loadingLabel);
         labelPanel.add(Box.createVerticalGlue());
-        
         panel.add(labelPanel);
         return panel;
     }
 
     private void loadResourcesInBackground() {
-        // 找到載入標籤
         JPanel loadingPanel = (JPanel) centerPanel.getComponent(0);
         JPanel labelPanel = (JPanel) loadingPanel.getComponent(0);
         final JLabel[] loadingLabelRef = new JLabel[1];
-        
-        // 遍歷所有組件找到標籤
+
         for (Component comp : labelPanel.getComponents()) {
             if (comp instanceof JLabel && "loadingLabel".equals(comp.getName())) {
                 loadingLabelRef[0] = (JLabel) comp;
                 break;
             }
         }
-        
+
         if (loadingLabelRef[0] == null) {
             System.err.println("找不到載入標籤");
             return;
@@ -130,16 +102,13 @@ public class HomePage extends JPanel {
 
         loadingLabelRef[0].setText("正在載入資源...");
 
-        // 立即載入所有圖片，包括首頁圖標
         CompletableFuture.runAsync(() -> {
             try {
-                // 載入所有圖標，包括首頁和搜尋
-                List<String> allImages = List.of(
-                    "/home.png", "/search.png", "/following.png", "/add.png", "/person.png"
-                );
-                allImages.parallelStream().forEach(path -> {
-                    String key = path.substring(1, path.length() - 4);
-                    loadImageToCache(path, key);
+                List<String> allImages = List.of("home", "search", "following", "add", "person");
+                allImages.parallelStream().forEach(key -> {
+                    String path = "/" + key + ".png";
+                    int size = "search".equals(key) ? 25 : 30;
+                    loadImageToCache(path, key, size, size);
                 });
             } catch (Exception e) {
                 System.err.println("載入圖片時發生錯誤: " + e.getMessage());
@@ -149,48 +118,35 @@ public class HomePage extends JPanel {
         SwingWorker<Void, String> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
-                // 1. 加載活動列表和收藏列表（並行執行）
                 publish("正在載入活動列表...");
-                CompletableFuture<List<Activity>> activitiesFuture = CompletableFuture
-                        .supplyAsync(DBUtil::getAllActivities);
-                
+                CompletableFuture<List<Activity>> activitiesFuture = CompletableFuture.supplyAsync(DBUtil::getAllActivities);
                 CompletableFuture<Set<Integer>> favoritesFuture = CompletableFuture.supplyAsync(() -> {
                     String userId = ActivityDetailFrame.getCurrentUserId();
                     return (userId != null) ? DBUtil.getFavoriteActivityIds(userId) : new HashSet<>();
                 });
 
-                // 2. 等待數據加載完成
                 CompletableFuture.allOf(activitiesFuture, favoritesFuture).join();
                 cachedActivities = activitiesFuture.get();
                 cachedFavoriteIds = favoritesFuture.get();
                 lastCacheUpdate = System.currentTimeMillis();
-
                 return null;
             }
 
             @Override
             protected void process(List<String> chunks) {
-                if (!chunks.isEmpty()) {
-                    loadingLabelRef[0].setText(chunks.get(chunks.size() - 1));
-                }
+                if (!chunks.isEmpty()) loadingLabelRef[0].setText(chunks.get(chunks.size() - 1));
             }
 
             @Override
             protected void done() {
                 try {
                     get();
-                    // 立即創建UI，不等待其他圖片
                     SwingUtilities.invokeLater(() -> {
                         createFullUI();
-                        // 使用更短的檢查間隔，檢查所有圖標
                         Timer timer = new Timer(50, e -> {
-                            if (iconCache.containsKey("home") &&
-                                iconCache.containsKey("search") &&
-                                iconCache.containsKey("following") && 
-                                iconCache.containsKey("add") && 
-                                iconCache.containsKey("person")) {
+                            if (iconCache.keySet().containsAll(List.of("home", "search", "following", "add", "person"))) {
                                 updateSouthPanelIcons();
-                                ((Timer)e.getSource()).stop();
+                                ((Timer) e.getSource()).stop();
                             }
                         });
                         timer.setRepeats(true);
@@ -199,10 +155,7 @@ public class HomePage extends JPanel {
                 } catch (Exception e) {
                     e.printStackTrace();
                     loadingLabelRef[0].setText("載入失敗：" + e.getMessage());
-                    JOptionPane.showMessageDialog(HomePage.this, 
-                        "載入失敗：" + e.getMessage(), 
-                        "錯誤",
-                        JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(HomePage.this, "載入失敗：" + e.getMessage(), "錯誤", JOptionPane.ERROR_MESSAGE);
                 }
             }
         };
@@ -215,13 +168,11 @@ public class HomePage extends JPanel {
         updateSouthPanelIcons();
         cardLayout.show(centerPanel, "home");
 
-        // 設置按鈕事件監聽器
         setBtnActionListener(home, "home");
         setBtnActionListener(following, "following");
         setBtnActionListener(addActivity, "addNew");
         setBtnActionListener(personalInfo, "my");
 
-        // 使用 SwingUtilities.invokeLater 確保 UI 更新在 EDT 中進行
         SwingUtilities.invokeLater(() -> {
             revalidate();
             repaint();
@@ -240,24 +191,35 @@ public class HomePage extends JPanel {
     }
 
     public void createCenterPanel() {
-        if (user == null) {
-            throw new IllegalStateException("用戶對象未初始化");
-        }
+        if (user == null) throw new IllegalStateException("用戶對象未初始化");
 
         northPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JPanel homePanel = new JPanel(new BorderLayout());
         homePanel.add(northPanel, BorderLayout.NORTH);
 
-        JTextField questionField = new JTextField();
-        JButton search = new JButton();
-        search.setIcon(iconCache.getOrDefault("search", null));
-        northPanel.add(questionField);
-        northPanel.add(search);
+        searchField = new JTextField();
+        searchField.setPreferredSize(new Dimension(200, 35));
+        searchField.setMaximumSize(new Dimension(200, 35));
+        searchField.putClientProperty("JComponent.roundRect", true);
+        searchField.putClientProperty("JTextField.placeholderText", "搜尋揪團...");
+
+        searchBtn = new JButton();
+        searchBtn.setIcon(iconCache.get("search"));
+        searchBtn.putClientProperty("JButton.buttonType", "toolBarButton");
+        searchBtn.setOpaque(true);
+        searchBtn.setBorderPainted(false);
+        searchBtn.setContentAreaFilled(true);
+        searchBtn.setFocusPainted(false);
+
+        northPanel.add(searchField);
+        northPanel.add(searchBtn);
+        northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         northPanel.setBackground(normalColor);
 
         actListPanel = new JPanel();
         JScrollPane scrollPane = new JScrollPane(actListPanel);
         actListPanel.setLayout(new BoxLayout(actListPanel, BoxLayout.Y_AXIS));
+        actListPanel.add(Box.createVerticalStrut(10));
         actListPanel.setBackground(Color.WHITE);
 
         displayActivities();
@@ -288,8 +250,7 @@ public class HomePage extends JPanel {
                         boolean isFavorited = cachedFavoriteIds.contains(act.getId());
                         RoundedPanel card = createActCard(act, isFavorited);
                         publish(card);
-                        if (i++ % 5 == 0)
-                            Thread.sleep(1);
+                        if (i++ % 5 == 0) Thread.sleep(1);
                     }
                     return null;
                 }
@@ -319,13 +280,12 @@ public class HomePage extends JPanel {
         following = new JButton("追蹤");
         personalInfo = new JButton("個人");
         btns.addAll(List.of(home, addActivity, following, personalInfo));
-        
-        // 設置按鈕字體
+
         Font buttonFont = new Font("Microsoft JhengHei", Font.PLAIN, 18);
         for (JButton btn : btns) {
             btn.setFont(buttonFont);
         }
-        
+
         setBtnStyle();
         southPanel.setPreferredSize(new Dimension(650, 60));
         add(southPanel, BorderLayout.SOUTH);
@@ -381,6 +341,7 @@ public class HomePage extends JPanel {
 
     public void setBtnStyle() {
         for (JButton btn : btns) {
+            btn.putClientProperty("JButton.buttonType", "square");
             btn.setOpaque(true);
             btn.setBorderPainted(false);
             btn.setContentAreaFilled(true);
@@ -434,17 +395,13 @@ public class HomePage extends JPanel {
     }
 
     public void setUser(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("用戶對象不能為空");
-        }
+        if (user == null) throw new IllegalArgumentException("用戶對象不能為空");
         this.user = user;
-        // 如果 personalPanel 已經存在，需要更新它
         if (personalPanel != null) {
             centerPanel.remove(personalPanel);
             personalPanel = new PersonalPanel(user);
             centerPanel.add(personalPanel, "my");
         }
-        refreshActivityList(); // 若登入後要重新刷新活動列表
+        refreshActivityList();
     }
-
 }
