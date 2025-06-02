@@ -1,13 +1,26 @@
 package org.groupapp;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Image;
 import java.net.URI;
 import java.net.URL;
-import java.awt.*;
-import javax.swing.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 public class PersonalPanel extends JPanel {
 
-    private JPanel panel, namePanel, emailPanel, phonePanel, IDPanel, genderPanel, radioPanel, imagePanel;
+    private JPanel panel, namePanel, emailPanel, phonePanel, IDPanel, genderPanel, radioPanel, imagePanel, topPanel, midPanel, bottomPanel;
     private JLabel labelName, labelEmail, labelPhone, labelID, labelGender, imageLabel;
     private JRadioButton femaleButton, maleButton, nonButton;
 
@@ -22,18 +35,34 @@ public class PersonalPanel extends JPanel {
     }
 
     public void createPanel() {
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
         image();
 
-        panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 1));
+        panel = new RoundedPanel(15);
+        panel.setBorder(BorderFactory.createLineBorder(Color.gray));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         IDPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         genderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        labelName = new JLabel("姓名：" + user.getName());
-        namePanel.add(labelName);
+// Panel -> top/ middle/ bottom
+
+        // topPanel -> name
+        labelName = new JLabel(user.getName());
+        labelName.setFont(new Font("微軟正黑體", Font.BOLD, 25));
+        labelName.setAlignmentX(CENTER_ALIGNMENT);
+        topPanel.add(labelName);
+
+        // midPanel -> label "個人資訊"/ edit btn
+        // bottomPanel -> emailLabel tf/ phoneLabel tf/ IDLabel genderLabel tf tf
+
+
+
+
+
         labelEmail = new JLabel("email：" + user.getEmail());
         emailPanel.add(labelEmail);
         labelPhone = new JLabel("手機號碼：" + user.getPhone());
@@ -41,11 +70,10 @@ public class PersonalPanel extends JPanel {
         labelID = new JLabel("ID：" + user.getId());
         IDPanel.add(labelID);
 
-        panel.add(namePanel);
-        panel.add(emailPanel);
-        panel.add(phonePanel);
-        panel.add(IDPanel);
-        panel.add(genderPanel);
+        bottomPanel.add(emailPanel);
+        bottomPanel.add(phonePanel);
+        bottomPanel.add(IDPanel);
+        bottomPanel.add(genderPanel);
         if (user.getGender() == null) {
             labelGender = new JLabel("性別：");
             genderPanel.add(labelGender);
@@ -54,6 +82,7 @@ public class PersonalPanel extends JPanel {
             labelGender = new JLabel("性別：" + user.getGender());
             genderPanel.add(labelGender);
         }
+
         add(panel, BorderLayout.CENTER);
     }
 
@@ -111,8 +140,12 @@ public class PersonalPanel extends JPanel {
             imageIcon = new ImageIcon(newimg);
 
             imageLabel = new JLabel(imageIcon);
-            imagePanel = new JPanel(new BorderLayout());
-            imagePanel.add(imageLabel, BorderLayout.CENTER);
+            imageLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+            imagePanel = new JPanel();
+            imagePanel.add(Box.createGlue());
+            imagePanel.add(imageLabel);
+            imagePanel.add(Box.createGlue());
+
             add(imagePanel, BorderLayout.NORTH);
 
         } catch (Exception e) {

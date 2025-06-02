@@ -97,7 +97,7 @@ public class Register extends JPanel {
 
         // backbtn 返回登入頁面
         Image imgBack = new ImageIcon(getClass().getResource("/back.png"))
-        .getImage().getScaledInstance(18, 31, Image.SCALE_SMOOTH);
+        .getImage().getScaledInstance(16, 29, Image.SCALE_SMOOTH);
         backbtn = new JButton();
         Icon backIcon = new ImageIcon(imgBack);
         backbtn.setIcon(backIcon);
@@ -112,7 +112,7 @@ public class Register extends JPanel {
         });
 
         buttonFin.setPreferredSize(new Dimension(100, 40));
-        backbtn.setPreferredSize(new Dimension(50, 20));
+        backbtn.setPreferredSize(new Dimension(16, 29));
         JPanel p1 = new JPanel();
         JPanel topPanel = new JPanel(new BorderLayout());
         JPanel labelPanel = new JPanel();
@@ -122,11 +122,12 @@ public class Register extends JPanel {
         backBtnPanel.setBackground(new Color(217,217,217));
 
         labelPanel.add(new JLabel("註冊新帳號！"));
+        labelPanel.setAlignmentY(CENTER_ALIGNMENT);
         labelPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         labelPanel.setBackground(new Color(217,217,217));
 
         topPanel.setBackground(new Color(217,217,217));
-        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 5, 0));
 
         p1.add(buttonFin);
         p1.setBorder(BorderFactory.createEmptyBorder(20, 0, 280, 0));
