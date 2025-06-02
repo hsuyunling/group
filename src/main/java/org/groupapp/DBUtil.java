@@ -1,5 +1,8 @@
 package org.groupapp;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,12 +19,32 @@ import javax.swing.JOptionPane;
 public class DBUtil {
     private static final String SERVER = "jdbc:mysql://140.119.19.73:3315/";
     private static final String DATABASE = "TG13"; // 你的資料庫名稱
-    private static final String URL = SERVER + DATABASE + "?useSSL=false";
-    private static final String USERNAME = "TG13"; // 你的帳號
-    private static final String PASSWORD = "pS7auF"; // 你的密碼
+    private static DataSource dataSource;
+
+    static {
+        try {
+            // 顯式加載 MySQL 驅動
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("MySQL 驅動加載成功");
+            
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(SERVER + DATABASE + "?useSSL=false");
+            config.setUsername("TG13");
+            config.setPassword("pS7auF");
+            config.setMaximumPoolSize(10);
+            dataSource = new HikariDataSource(config);
+            System.out.println("數據庫連接池初始化成功");
+        } catch (ClassNotFoundException e) {
+            System.err.println("找不到 MySQL 驅動程序：" + e.getMessage());
+            throw new RuntimeException("找不到 MySQL 驅動程序", e);
+        } catch (Exception e) {
+            System.err.println("數據庫連接池初始化失敗：" + e.getMessage());
+            throw new RuntimeException("數據庫連接池初始化失敗", e);
+        }
+    }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        return dataSource.getConnection();
     }
 
     public static java.util.List<String> searchActivitiesByName(String keyword) {
@@ -247,58 +270,117 @@ public class DBUtil {
     }
 
     // 輸入非必要資料，性別
-    public void execute(String gender) {
+    public boolean execute(String gender, String name) {
         // try-with 確保關掉
         try (Connection conn = getConnection()) {
             System.out.println("DB Connected");
-            String query = "INSERT INTO `user`(gender) VALUES(?)";
+            String query = "UPDATE `user` SET gender = ? WHERE name = ?;";
+
             try (PreparedStatement pstmt = conn.prepareStatement(query)) {
                 pstmt.setString(1, gender);
+                pstmt.setString(2, name);
                 pstmt.executeUpdate();
-
-                JOptionPane.showMessageDialog(null, "儲存成功！", "嘻嘻", JOptionPane.PLAIN_MESSAGE);
+                return true;
             }
         } catch (SQLException e) {
             System.out.println("資料庫錯誤：" + e.getMessage());
+            return false;
         }
     }
 
     boolean success = false;
 
-    // 檢查登入帳密是否正確
+    // 保留你原來的 select 方法做向後兼容
     public User select(String id, String pass) {
-        try (Connection conn = getConnection()) {
-            System.out.println("DB Connected");
+        User user = authenticateUser(id, pass);
+        this.success = (user != null);
+        return user;
+    }
 
-            String query = "SELECT * FROM user WHERE id=? AND password=?";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, id);
-            pstmt.setString(2, pass);
+    // 改進的 select 方法 - 使用原來的結構但優化效能
+    public static User authenticateUser(String id, String password) {
+        // 輸入驗證
+        if (id == null || id.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            return null;
+        }
+
+        String query = "SELECT id, name, email, phone, gender FROM user WHERE id = ? AND password = ?";
+
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            System.out.println("正在驗證使用者：" + id);
+
+            pstmt.setString(1, id.trim());
+            pstmt.setString(2, password.trim());
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    success = true;
-                    String name = rs.getString("name");
-                    String email = rs.getString("email");
-                    String phone = rs.getString("phone");
-                    String gender = rs.getString("gender");
+                    // 建立 User 物件
+                    User user = new User(
+                            rs.getString("id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getString("gender"));
 
-                    return new User(id, name, email, phone, gender);
-
+                    System.out.println("使用者驗證成功：" + user.getName());
+                    return user;
                 } else {
-                    success = false;
+                    System.out.println("使用者驗證失敗：帳號或密碼錯誤");
                     return null;
                 }
             }
-
         } catch (SQLException e) {
-            System.out.println("資料庫錯誤：" + e.getMessage());
+            System.err.println("資料庫連接錯誤：" + e.getMessage());
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            System.err.println("未預期的錯誤：" + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
+    // 檢查成功登入與否
     public boolean getSuccess() {
         return success;
+    }
+
+    // 編輯個人資訊
+    public boolean updateUser(User user) {
+        try (Connection conn = getConnection()) {
+            String query = "UPDATE `user` SET name = ?, email = ?, phone = ?, gender = ? WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, user.getName());
+                pstmt.setString(2, user.getEmail());
+                pstmt.setString(3, user.getPhone());
+                pstmt.setString(4, user.getGender());
+                pstmt.setString(5, user.getId()); // id 當作唯一辨識
+                pstmt.executeUpdate();
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println("資料庫錯誤：" + e.getMessage());
+            return false;
+        }
+    }
+
+    // 檢查學號是否已註冊
+    public boolean isNumberExists(String number) {
+        try (Connection conn = getConnection()) {
+            String query = "SELECT COUNT(*) FROM user WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, number);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static boolean addActivity(Activity act) {
@@ -314,7 +396,7 @@ public class DBUtil {
                 return false;
             }
 
-            // 必填欄位檢查（你可以依需求擴充）
+            // 必填欄位檢查
             if (act.getName().isEmpty() || act.getDate().isEmpty() || act.getTime().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "請填寫活動名稱、日期和時間", "資料不完整", JOptionPane.WARNING_MESSAGE);
                 return false;

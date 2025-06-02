@@ -1,10 +1,12 @@
 package org.groupapp;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -16,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 public class MainFrame extends JFrame {
@@ -33,23 +36,20 @@ public class MainFrame extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // 加入 登入/註冊 頁面
+        // 創建一個臨時的面板，用於顯示載入中狀態
+        JPanel loadingPanel = new JPanel(new BorderLayout());
+        loadingPanel.add(new JLabel("請先登入", JLabel.CENTER), BorderLayout.CENTER);
+        mainPanel.add(loadingPanel, "home");
+
         JPanel loginPanel = createLoginPanel();
         JPanel registerPanel = new Register(cardLayout, mainPanel);
         mainPanel.add(loginPanel, "login");
         mainPanel.add(registerPanel, "register");
 
-        // 加入主頁面（但尚未顯示）
-        /*
-         * homePage = new HomePage(user);
-         * mainPanel.add(homePage, "home");
-         */
-
         add(mainPanel);
-        cardLayout.show(mainPanel, "login"); // 預設顯示登入頁
+        cardLayout.show(mainPanel, "login");
     }
 
-    // 登入頁面，含註冊按鈕
     public JPanel createLoginPanel() {
         JPanel panel = new JPanel();
         JPanel container = new RoundedPanel(40);
@@ -75,39 +75,34 @@ public class MainFrame extends JFrame {
 
         panel.setBorder(BorderFactory.createEmptyBorder(60, 100, 60, 100));
         container.setBorder(BorderFactory.createEmptyBorder(20, 100, 30, 100));
-
         panel.setBackground(new Color(246, 209, 86));
 
-        // 標題
         JLabel title = new JLabel("登入 Group");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        title.setFont(new Font("Microsoft JhengHei", Font.BOLD, 22)); // 支援中文字型
+        title.setFont(new Font("Microsoft JhengHei", Font.BOLD, 22));
         title.setBorder(BorderFactory.createEmptyBorder(15, 0, 30, 0));
         p0.add(title);
 
-        // 學號欄位
         JTextField idField = new JTextField();
         JLabel idLabel = new JLabel("學號：");
         idField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        idField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); //
-        idLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); //
+        idField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16));
+        idLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16));
         p1.add(idLabel);
         p1.add(idField);
 
-        // 密碼欄位
         JPasswordField pwdField = new JPasswordField();
         JLabel pwdLabel = new JLabel("密碼：");
         pwdField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        pwdLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); //
-        pwdField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16)); //
+        pwdLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16));
+        pwdField.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 16));
         p2.add(pwdLabel);
         p2.add(pwdField);
 
-        // 登入按鈕
         JButton loginBtn = new JButton("登入");
         loginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginBtn.setMaximumSize(new Dimension(100, 40));
-        loginBtn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 16)); //
+        loginBtn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 16));
         loginBtn.setBackground(new Color(246, 209, 86));
         loginBtn.setForeground(Color.black);
         loginBtn.setFocusPainted(false);
@@ -126,36 +121,69 @@ public class MainFrame extends JFrame {
 
         
         p3.add(Box.createRigidArea(new Dimension(70, 0))); // 開頭空格
+
+  
         p3.add(loginBtn);
-        // p3.add(Box.createRigidArea(new Dimension(5, 0))); // login 和 register 之間空格
         p3.add(registerBtn);
 
-        // 邏輯處理(登入)
         loginBtn.addActionListener(e -> {
-            DBUtil c = new DBUtil();
             String id = idField.getText().trim();
             String pwd = new String(pwdField.getPassword()).trim();
-            User user = c.select(id, pwd);
-            String result;
-            if (c.getSuccess()) {
-                result = "登入成功！";
-                JOptionPane.showMessageDialog(null, result, "結果", JOptionPane.PLAIN_MESSAGE);
 
-                homePage = new HomePage(user); // 傳入 user
-                mainPanel.add(homePage, "home"); // 加進 CardLayout
-                cardLayout.show(mainPanel, "home"); // 切換畫面
-            } else {
-                result = "帳號或密碼錯誤！";
-                JOptionPane.showMessageDialog(null, result, "結果", JOptionPane.PLAIN_MESSAGE);
-            }
+            SwingWorker<User, Void> loginWorker = new SwingWorker<User, Void>() {
+                @Override
+                protected User doInBackground() throws Exception {
+                    return DBUtil.authenticateUser(id, pwd);
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        User user = get();
+
+                        if (user != null) {
+                            JOptionPane.showMessageDialog(
+                                    MainFrame.this,
+                                    "登入成功！",
+                                    "結果",
+                                    JOptionPane.PLAIN_MESSAGE);
+
+                            // 登入成功後才創建 HomePage
+                            if (homePage == null) {
+                                homePage = new HomePage(user);
+                                mainPanel.remove(mainPanel.getComponent(0)); // 移除臨時面板
+                                mainPanel.add(homePage, "home");
+                            } else {
+                                homePage.setUser(user);
+                            }
+                            cardLayout.show(mainPanel, "home");
+
+                        } else {
+                            JOptionPane.showMessageDialog(
+                                    MainFrame.this,
+                                    "帳號或密碼錯誤！",
+                                    "結果",
+                                    JOptionPane.PLAIN_MESSAGE);
+                        }
+
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(
+                                MainFrame.this,
+                                "登入時發生錯誤：" + ex.getMessage(),
+                                "錯誤",
+                                JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
+                }
+            };
+
+            loginWorker.execute();
         });
 
-        // 邏輯處理(註冊)
         registerBtn.addActionListener(e -> {
-            cardLayout.show(mainPanel, "register"); // 切換畫面
+            cardLayout.show(mainPanel, "register");
         });
 
         return panel;
     }
-
 }

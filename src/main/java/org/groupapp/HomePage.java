@@ -1,30 +1,15 @@
+// HomePage.java（已整合快取與縮放）
 package org.groupapp;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Image;
+import java.awt.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonModel;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.swing.*;
 
 public class HomePage extends JPanel {
 
@@ -34,60 +19,182 @@ public class HomePage extends JPanel {
     private JPanel southPanel, northPanel, centerPanel;
     private JButton home, following, addActivity, personalInfo, searchBtn;
     JPanel actListPanel, followingPanel, addNew, personalPanel;
-    JTextField searchField;
-    Font font = new Font("Arial", Font.PLAIN, 18);
-    ArrayList<JButton> btns = new ArrayList<>();
-    User user = new User();
 
+    JTextField searchField;
+    Font font = new Font("Microsoft JhengHei", Font.PLAIN, 18);
+    ArrayList<JButton> btns = new ArrayList<>();
+    User user;
     Color normalColor = new Color(246, 209, 86);
     Color pressedColor = new Color(195, 170, 87);
 
-    // 圖片
-    Image imageHome, imageFollowing, imageAddNew, imageInfo, imageSearch;
+    private static final Map<String, Icon> iconCache = new ConcurrentHashMap<>();
+    private List<Activity> cachedActivities = new ArrayList<>();
+    private Set<Integer> cachedFavoriteIds = new HashSet<>();
+    private long lastCacheUpdate = 0;
+    private static final long CACHE_DURATION = 30000;
 
     public HomePage(User user) {
+        if (user == null) throw new IllegalArgumentException("用戶對象不能為空");
         this.user = user;
         setLayout(new BorderLayout());
+        initBasicUI();
+        loadResourcesInBackground();
+    }
 
-        imageHome = new ImageIcon(getClass().getResource("/home.png"))
-                .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageFollowing = new ImageIcon(getClass().getResource("/following.png"))
-                .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageAddNew = new ImageIcon(getClass().getResource("/add.png"))
-                .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageInfo = new ImageIcon(getClass().getResource("/person.png"))
-                .getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        imageSearch = new ImageIcon(getClass().getResource("/search.png"))
-                .getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+    private void loadImageToCache(String resourcePath, String key, int width, int height) {
+        if (!iconCache.containsKey(key)) {
+            try {
+                Image image = new ImageIcon(getClass().getResource(resourcePath))
+                        .getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                iconCache.put(key, new ImageIcon(image));
+            } catch (Exception e) {
+                System.err.println("載入圖片失敗 " + resourcePath + ": " + e.getMessage());
+            }
+        }
+    }
 
+    private void initBasicUI() {
+        centerPanel = new JPanel();
+        centerPanel.setLayout(cardLayout);
+        centerPanel.add(createLoadingPanel(), "loading");
+        add(centerPanel);
+        cardLayout.show(centerPanel, "loading");
+        createBasicSouthPanel();
+    }
+
+    private JPanel createLoadingPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(normalColor);
+
+        JPanel labelPanel = new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
+        labelPanel.setBackground(normalColor);
+
+        JLabel loadingLabel = new JLabel("載入中...");
+        loadingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        loadingLabel.setFont(new Font("Microsoft JhengHei", Font.BOLD, 18));
+        loadingLabel.setName("loadingLabel");
+
+        labelPanel.add(Box.createVerticalGlue());
+        labelPanel.add(loadingLabel);
+        labelPanel.add(Box.createVerticalGlue());
+        panel.add(labelPanel);
+        return panel;
+    }
+
+    private void loadResourcesInBackground() {
+        JPanel loadingPanel = (JPanel) centerPanel.getComponent(0);
+        JPanel labelPanel = (JPanel) loadingPanel.getComponent(0);
+        final JLabel[] loadingLabelRef = new JLabel[1];
+
+        for (Component comp : labelPanel.getComponents()) {
+            if (comp instanceof JLabel && "loadingLabel".equals(comp.getName())) {
+                loadingLabelRef[0] = (JLabel) comp;
+                break;
+            }
+        }
+
+        if (loadingLabelRef[0] == null) {
+            System.err.println("找不到載入標籤");
+            return;
+        }
+
+        loadingLabelRef[0].setText("正在載入資源...");
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                List<String> allImages = List.of("home", "search", "following", "add", "person");
+                allImages.parallelStream().forEach(key -> {
+                    String path = "/" + key + ".png";
+                    int size = "search".equals(key) ? 25 : 30;
+                    loadImageToCache(path, key, size, size);
+                });
+            } catch (Exception e) {
+                System.err.println("載入圖片時發生錯誤: " + e.getMessage());
+            }
+        });
+
+        SwingWorker<Void, String> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                publish("正在載入活動列表...");
+                CompletableFuture<List<Activity>> activitiesFuture = CompletableFuture.supplyAsync(DBUtil::getAllActivities);
+                CompletableFuture<Set<Integer>> favoritesFuture = CompletableFuture.supplyAsync(() -> {
+                    String userId = ActivityDetailFrame.getCurrentUserId();
+                    return (userId != null) ? DBUtil.getFavoriteActivityIds(userId) : new HashSet<>();
+                });
+
+                CompletableFuture.allOf(activitiesFuture, favoritesFuture).join();
+                cachedActivities = activitiesFuture.get();
+                cachedFavoriteIds = favoritesFuture.get();
+                lastCacheUpdate = System.currentTimeMillis();
+                return null;
+            }
+
+            @Override
+            protected void process(List<String> chunks) {
+                if (!chunks.isEmpty()) loadingLabelRef[0].setText(chunks.get(chunks.size() - 1));
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    SwingUtilities.invokeLater(() -> {
+                        createFullUI();
+                        Timer timer = new Timer(50, e -> {
+                            if (iconCache.keySet().containsAll(List.of("home", "search", "following", "add", "person"))) {
+                                updateSouthPanelIcons();
+                                ((Timer) e.getSource()).stop();
+                            }
+                        });
+                        timer.setRepeats(true);
+                        timer.start();
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    loadingLabelRef[0].setText("載入失敗：" + e.getMessage());
+                    JOptionPane.showMessageDialog(HomePage.this, "載入失敗：" + e.getMessage(), "錯誤", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        };
+        worker.execute();
+    }
+
+    private void createFullUI() {
+        centerPanel.removeAll();
         createCenterPanel();
-        createSouthPanel();
-
+        updateSouthPanelIcons();
         cardLayout.show(centerPanel, "home");
 
         setBtnActionListener(home, "home");
         setBtnActionListener(following, "following");
         setBtnActionListener(addActivity, "addNew");
         setBtnActionListener(personalInfo, "my");
-    }
 
-    // ---------------切換主頁面-------------------
-    public void setBtnActionListener(JButton btn, String cardName) {
-        btn.addActionListener(e -> {
-            if ("following".equals(cardName)) {
-                centerPanel.remove(followingPanel); // 先移除舊的
-                followingPanel = new FollowingPanel(); // 建立新的
-                centerPanel.add(followingPanel, "following"); // 加入新的
-            }
-            cardLayout.show(centerPanel, cardName); // 切換畫面
+        SwingUtilities.invokeLater(() -> {
+            revalidate();
+            repaint();
         });
     }
 
-    // ---------------主頁面-------------------
+    public void setBtnActionListener(JButton btn, String cardName) {
+        btn.addActionListener(e -> {
+            if ("following".equals(cardName)) {
+                centerPanel.remove(followingPanel);
+                followingPanel = new FollowingPanel();
+                centerPanel.add(followingPanel, "following");
+            }
+            cardLayout.show(centerPanel, cardName);
+        });
+    }
+
     public void createCenterPanel() {
+        if (user == null) throw new IllegalStateException("用戶對象未初始化");
+
         northPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JPanel homePanel = new JPanel();
-        homePanel.setLayout(new BorderLayout());
+        JPanel homePanel = new JPanel(new BorderLayout());
         homePanel.add(northPanel, BorderLayout.NORTH);
 
         searchField = new JTextField();
@@ -97,18 +204,17 @@ public class HomePage extends JPanel {
         searchField.putClientProperty("JTextField.placeholderText", "搜尋揪團...");
 
         searchBtn = new JButton();
-        Icon searchIcon = new ImageIcon(imageSearch);
-        searchBtn.setIcon(searchIcon);
+        searchBtn.setIcon(iconCache.get("search"));
+        searchBtn.putClientProperty("JButton.buttonType", "toolBarButton");
+        searchBtn.setOpaque(true);
+        searchBtn.setBorderPainted(false);
+        searchBtn.setContentAreaFilled(true);
+        searchBtn.setFocusPainted(false);
 
         northPanel.add(searchField);
         northPanel.add(searchBtn);
-        northPanel.add(Box.createRigidArea(new Dimension(10,0)));
-
-
+        northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         northPanel.setBackground(normalColor);
-
-        centerPanel = new JPanel();
-        centerPanel.setLayout(cardLayout);
 
         actListPanel = new JPanel();
         JScrollPane scrollPane = new JScrollPane(actListPanel);
@@ -116,27 +222,14 @@ public class HomePage extends JPanel {
         actListPanel.add(Box.createVerticalStrut(10));
         actListPanel.setBackground(Color.WHITE);
 
-        List<Activity> activities = DBUtil.getAllActivities();
-        String userId = ActivityDetailFrame.getCurrentUserId();
-        Set<Integer> favoriteIds = (userId != null) ? DBUtil.getFavoriteActivityIds(userId) : new HashSet<>();
-
-        if (activities.isEmpty()) {
-            actListPanel.add(new JLabel("目前沒有活動"));
-        } else {
-            for (Activity act : activities) {
-                boolean isFavorited = favoriteIds.contains(act.getId());
-                actListPanel.add(createActCard(act, isFavorited));
-                actListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-            }
-        }
+        displayActivities();
 
         addNew = new EditPanel();
         followingPanel = new FollowingPanel();
-
         personalPanel = new PersonalPanel(user);
 
         centerPanel.add(homePanel, "home");
-        centerPanel.add(addNew, "addNew"); // 連接EditPanel
+        centerPanel.add(addNew, "addNew");
         centerPanel.add(followingPanel, "following");
         centerPanel.add(personalPanel, "my");
 
@@ -144,45 +237,77 @@ public class HomePage extends JPanel {
         add(centerPanel);
     }
 
-    // ---------------底下的四個按鈕-------------------
-    public void createSouthPanel() {
-        southPanel = new JPanel();
-        southPanel.setLayout(new GridLayout(1, 4));
+    private void displayActivities() {
+        actListPanel.removeAll();
+        if (cachedActivities.isEmpty()) {
+            actListPanel.add(new JLabel("目前沒有活動"));
+        } else {
+            SwingWorker<Void, RoundedPanel> displayWorker = new SwingWorker<>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    int i = 0;
+                    for (Activity act : cachedActivities) {
+                        boolean isFavorited = cachedFavoriteIds.contains(act.getId());
+                        RoundedPanel card = createActCard(act, isFavorited);
+                        publish(card);
+                        if (i++ % 5 == 0) Thread.sleep(1);
+                    }
+                    return null;
+                }
 
-        Icon homeIcon = new ImageIcon(imageHome);
-        Icon addIcon = new ImageIcon(imageAddNew);
-        Icon followingIcon = new ImageIcon(imageFollowing);
-        Icon infoIcon = new ImageIcon(imageInfo);
+                @Override
+                protected void process(List<RoundedPanel> chunks) {
+                    for (RoundedPanel card : chunks) {
+                        actListPanel.add(card);
+                        actListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+                    }
+                    actListPanel.revalidate();
+                }
 
-        home = new JButton();
-        home.setIcon(homeIcon);
-        home.setToolTipText("Home");
+                @Override
+                protected void done() {
+                    actListPanel.repaint();
+                }
+            };
+            displayWorker.execute();
+        }
+    }
 
-        addActivity = new JButton();
-        addActivity.setIcon(addIcon);
-        addActivity.setToolTipText("Add");
+    public void createBasicSouthPanel() {
+        southPanel = new JPanel(new GridLayout(1, 4));
+        home = new JButton("首頁");
+        addActivity = new JButton("新增");
+        following = new JButton("追蹤");
+        personalInfo = new JButton("個人");
+        btns.addAll(List.of(home, addActivity, following, personalInfo));
 
-        following = new JButton();
-        following.setIcon(followingIcon);
-        following.setToolTipText("Following");
-
-        personalInfo = new JButton();
-        personalInfo.setIcon(infoIcon);
-        personalInfo.setToolTipText("My");
-
-        btns.add(home);
-        btns.add(addActivity);
-        btns.add(following);
-        btns.add(personalInfo);
+        Font buttonFont = new Font("Microsoft JhengHei", Font.PLAIN, 18);
+        for (JButton btn : btns) {
+            btn.setFont(buttonFont);
+        }
 
         setBtnStyle();
-
         southPanel.setPreferredSize(new Dimension(650, 60));
         add(southPanel, BorderLayout.SOUTH);
     }
 
+    private void updateSouthPanelIcons() {
+        Map<JButton, String> buttonIconMap = Map.of(
+                home, "home",
+                addActivity, "add",
+                following, "following",
+                personalInfo, "person");
+        for (Map.Entry<JButton, String> entry : buttonIconMap.entrySet()) {
+            Icon icon = iconCache.get(entry.getValue());
+            if (icon != null) {
+                JButton btn = entry.getKey();
+                btn.setIcon(icon);
+                btn.setText("");
+                btn.setToolTipText(entry.getValue());
+            }
+        }
+    }
 
-// ---------------中間的活動-------------------
     private RoundedPanel createActCard(Activity act, boolean isFavorited) {
         RoundedPanel panel = new RoundedPanel(15);
         panel.setLayout(new BorderLayout());
@@ -192,9 +317,8 @@ public class HomePage extends JPanel {
         panel.setBackground(new Color(246, 220, 135));
 
         String title = String.format(
-                "<html><div><b>%s%s</b><br><br>時間：%s %s<br>地點：%s<div></html>",
-                isFavorited ? "★ " : "  ",
-                act.getName(), act.getDate(), act.getTime(), act.getPlace());
+                "<html><div style='font-family: Microsoft JhengHei;'><b>%s%s</b><br><br>時間：%s %s<br>地點：%s<div></html>",
+                isFavorited ? "★ " : "  ", act.getName(), act.getDate(), act.getTime(), act.getPlace());
 
         JLabel label = new JLabel(title);
         label.setFont(font);
@@ -215,57 +339,69 @@ public class HomePage extends JPanel {
         return panel;
     }
 
-    // ---------------按鈕形式-------------------
     public void setBtnStyle() {
-
-        Font f = new Font("Calibri", Font.PLAIN, 18);
-
-        // ---------------底下四個按鈕-------------------
         for (JButton btn : btns) {
-            final JButton thisBtn = btn;
-            thisBtn.putClientProperty( "JButton.buttonType", "square" );
-            thisBtn.setOpaque(true);
-            thisBtn.setBorderPainted(false);
-            thisBtn.setContentAreaFilled(true);
-            thisBtn.setFocusPainted(false);
-
-            thisBtn.setBackground(normalColor);
-
-            thisBtn.getModel().addChangeListener(e -> {
-                ButtonModel model = thisBtn.getModel();
-                if (model.isPressed()) {
-                    thisBtn.setBackground(pressedColor);
-                } else {
-                    thisBtn.setBackground(normalColor);
-                }
+            btn.putClientProperty("JButton.buttonType", "square");
+            btn.setOpaque(true);
+            btn.setBorderPainted(false);
+            btn.setContentAreaFilled(true);
+            btn.setFocusPainted(false);
+            btn.setBackground(normalColor);
+            btn.getModel().addChangeListener(e -> {
+                ButtonModel model = btn.getModel();
+                btn.setBackground(model.isPressed() ? pressedColor : normalColor);
             });
-            southPanel.add(thisBtn);
+            southPanel.add(btn);
         }
-
-        
-        searchBtn.putClientProperty( "JButton.buttonType", "toolBarButton" );
-        searchBtn.setOpaque(true);
-        searchBtn.setBorderPainted(false);
-        searchBtn.setContentAreaFilled(true);
-        searchBtn.setFocusPainted(false);
-
     }
 
     public void refreshActivityList() {
-        actListPanel.removeAll();
-
-        List<Activity> activities = DBUtil.getAllActivities();
-        String userId = ActivityDetailFrame.getCurrentUserId();
-        Set<Integer> favoriteIds = (userId != null) ? DBUtil.getFavoriteActivityIds(userId) : new HashSet<>();
-
-        for (Activity act : activities) {
-            boolean isFavorited = favoriteIds.contains(act.getId());
-            actListPanel.add(createActCard(act, isFavorited));
-            actListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastCacheUpdate < CACHE_DURATION) {
+            displayActivities();
+            return;
         }
 
+        actListPanel.removeAll();
+        actListPanel.add(new JLabel("重新載入中...", JLabel.CENTER));
         actListPanel.revalidate();
         actListPanel.repaint();
+
+        SwingWorker<Void, Void> refreshWorker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                cachedActivities = DBUtil.getAllActivities();
+                String userId = ActivityDetailFrame.getCurrentUserId();
+                cachedFavoriteIds = (userId != null) ? DBUtil.getFavoriteActivityIds(userId) : new HashSet<>();
+                lastCacheUpdate = System.currentTimeMillis();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    displayActivities();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    actListPanel.removeAll();
+                    actListPanel.add(new JLabel("載入活動失敗：" + e.getMessage()));
+                    actListPanel.revalidate();
+                    actListPanel.repaint();
+                }
+            }
+        };
+        refreshWorker.execute();
     }
 
+    public void setUser(User user) {
+        if (user == null) throw new IllegalArgumentException("用戶對象不能為空");
+        this.user = user;
+        if (personalPanel != null) {
+            centerPanel.remove(personalPanel);
+            personalPanel = new PersonalPanel(user);
+            centerPanel.add(personalPanel, "my");
+        }
+        refreshActivityList();
+    }
 }
